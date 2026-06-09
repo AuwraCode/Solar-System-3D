@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Solar System Explorer 3D</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app"></div>
+<div id="labels"></div>
+
+<div id="topbar">
+  <button id="btnNav">☰ Explore</button>
+  <span class="brand">Solar System <span class="sub">Explorer 3D</span></span>
+  <button id="btnTour">▶ Tour</button>
+  <div id="crumb">Solar System</div>
+  <div class="toggles">
+    <label><input type="checkbox" id="chkLabels" checked> Labels</label>
+    <label><input type="checkbox" id="chkOrbits" checked> Orbits</label>
+  </div>
+  <button id="btnOverview" title="Full system view (Esc)">⌂</button>
+  <button id="btnHelp" title="Help (H)">?</button>
+</div>
+
+<div id="drawer">
+  <div class="drawer-top">
+    <input id="navSearch" type="text" placeholder="Search planets, moons, probes…" autocomplete="off">
+    <button id="btnCloseDrawer">✕</button>
+  </div>
+  <div id="navList"></div>
+</div>
+
+<div id="infoPanel">
+  <div class="info-head">
+    <div>
+      <div id="infoTitle"></div>
+      <div id="infoKind"></div>
+    </div>
+    <button id="btnCloseInfo">✕</button>
+  </div>
+  <div id="infoBody"></div>
+</div>
+
+<div id="timebar">
+  <button id="btnReverse" title="Reverse time">⇄</button>
+  <button id="btnSlower" title="Slower (,)">−</button>
+  <button id="btnPause" title="Pause (Space)">⏸</button>
+  <button id="btnFaster" title="Faster (.)">+</button>
+  <div id="speedLabel"></div>
+  <div id="dateLabel"></div>
+  <button id="btnNow" title="Jump back to the real current date">Now</button>
+</div>
+
+<div id="cornerRight">
+  <button id="btnZoomIn" title="Zoom in">+</button>
+  <button id="btnZoomOut" title="Zoom out">−</button>
+</div>
+
+<div id="disclaimer">
+  Orbits &amp; positions: real Kepler elements (approximate). Sizes and moon
+  distances compressed for visibility — space is far emptier than this.
+</div>
+
+<div id="toast"></div>
+
+<div id="help">
+  <div class="help-card">
+    <h2>How to explore</h2>
+    <h3>Travel</h3>
+    <div class="hk">
+      <b>Click object / label</b><span>Fly to it and open its fact sheet</span>
+      <b>☰ Explore menu</b><span>Every planet, moon, probe and comet</span>
+      <b>Drag</b><span>Orbit around the current target</span>
+      <b>Scroll / pinch</b><span>Zoom — go all the way to the surface</span>
+      <b>Double-click</b><span>Dive closer</span>
+      <b>Esc</b><span>Back to the full system view</span>
+      <b>0–9</b><span>Sun &amp; planets shortcuts (9 = Pluto)</span>
+    </div>
+    <h3>Free flight</h3>
+    <div class="hk">
+      <b>F</b><span>Toggle free-flight mode</span>
+      <b>W A S D + Q E</b><span>Move (speed adapts to what's nearby)</span>
+      <b>Shift</b><span>Boost</span>
+      <b>Drag</b><span>Look around</span>
+    </div>
+    <h3>Time machine</h3>
+    <div class="hk">
+      <b>Space</b><span>Pause / resume time</span>
+      <b>, and .</b><span>Slower / faster</span>
+      <b>⇄</b><span>Run time backwards</span>
+      <b>T</b><span>Start / stop the grand tour</span>
+      <b>L / O</b><span>Toggle labels / orbit lines</span>
+    </div>
+    <p class="help-note">
+      Planet positions are computed from their real orbital elements for the
+      simulated date — rewind to see Halley's Comet in 1986, or fast-forward
+      to its 2061 return. Planet sizes and moon orbits are exaggerated so
+      everything stays visible; heliocentric distances are to scale.
+    </p>
+    <button id="btnCloseHelp">Close</button>
+  </div>
+</div>
+
+<div id="loading">
+  <div class="load-sun"></div>
+  <div class="load-title">Solar System</div>
+  <div class="load-track"><div id="loadBar"></div></div>
+  <div id="loadStatus">Warming up…</div>
+</div>
+
+<div id="errbox"></div>
+
+<script src="js/vendor/three.min.js"></script>
+<script>
+  if (typeof THREE === 'undefined') {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"><\/script>');
+  }
+</script>
+<script src="js/noise.js"></script>
+<script src="js/data.js"></script>
+<script src="js/orbits.js"></script>
+<script src="js/textures.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/controls.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
