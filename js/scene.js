@@ -6,6 +6,8 @@ const SCENE = (function () {
   let root, rendererRef, labelBox, camRef;
   let sunUniforms, earthUniforms, sunCorona, sunCore;
   let beltMesh, beltData, kuiperPts;
+  let sunProms = [], meteors = [];
+  const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
   const tmpV = null;
@@ -51,14 +53,24 @@ const SCENE = (function () {
     void main(){
       ${LOGDEPTH_F_MAIN}
       vec3 p = normalize(vPos);
-      float n = fbm(p*6.0 + vec3(uTime*0.016, uTime*0.011, -uTime*0.009));
-      float n2 = fbm(p*16.0 - vec3(uTime*0.025, 0.0, uTime*0.018));
-      float v = n*0.72 + n2*0.40;
-      vec3 col = mix(vec3(0.95,0.32,0.02), vec3(1.0,0.78,0.30), smoothstep(0.28,0.72,v));
-      col = mix(col, vec3(1.0,0.96,0.82), smoothstep(0.70,0.94,v));
+      float n = fbm(p*6.0 + vec3(uTime*0.02, uTime*0.013, -uTime*0.011));
+      float n2 = fbm(p*16.0 - vec3(uTime*0.03, 0.0, uTime*0.022));
+      float gran = fbm(p*40.0 + vec3(0.0, uTime*0.05, 0.0));
+      float v = n*0.72 + n2*0.40 + gran*0.10;
+      vec3 col = mix(vec3(0.95,0.30,0.02), vec3(1.0,0.80,0.32), smoothstep(0.26,0.72,v));
+      col = mix(col, vec3(1.0,0.97,0.84), smoothstep(0.70,0.95,v));
+      /* migrating sunspots: dark umbra ringed by a warm penumbra */
+      float spot = fbm(p*2.4 + vec3(13.0,-7.0,uTime*0.006));
+      float umbra = smoothstep(0.34,0.24,spot);
+      float pen = smoothstep(0.44,0.34,spot) * (1.0-umbra);
+      col = mix(col, vec3(0.32,0.12,0.03), pen*0.5);
+      col = mix(col, vec3(0.12,0.04,0.02), umbra);
       float lim = pow(max(dot(normalize(vN), vec3(0.0,0.0,1.0)), 0.0), 0.55);
+      /* faculae: bright granular network, strongest toward the limb */
+      float fac = smoothstep(0.60,0.82,n2) * (0.4+0.6*(1.0-lim));
+      col += vec3(0.30,0.22,0.10)*fac;
       col *= 0.5 + 0.55*lim;
-      gl_FragColor = vec4(col*1.3, 1.0);
+      gl_FragColor = vec4(col*1.32, 1.0);
     }`;
 
   const ATMO_VERT = `
@@ -154,6 +166,31 @@ const SCENE = (function () {
         col += aur * curtain * polar * nightf * 1.15;
       }
       gl_FragColor = vec4(lin2srgb(col), 1.0);
+    }`;
+
+  const STAR_VERT = `
+    attribute float phase;
+    attribute vec3 color;
+    uniform float uTime; uniform float uSize;
+    varying vec3 vColor; varying float vTw;
+    ${LOGDEPTH_V}
+    void main(){
+      vColor = color;
+      float tw = 0.5 + 0.35*sin(uTime*1.8 + phase) + 0.15*sin(uTime*4.7 + phase*1.7);
+      vTw = clamp(tw, 0.0, 1.0);
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = uSize * (0.8 + 0.45*vTw);
+      ${LOGDEPTH_V_MAIN}
+    }`;
+
+  const STAR_FRAG = `
+    uniform sampler2D uMap;
+    varying vec3 vColor; varying float vTw;
+    ${LOGDEPTH_F}
+    void main(){
+      ${LOGDEPTH_F_MAIN}
+      vec4 t = texture2D(uMap, gl_PointCoord);
+      gl_FragColor = vec4(vColor, t.a * (0.35 + 0.65*vTw));
     }`;
 
   /* ---------- helpers ---------- */
@@ -422,6 +459,7 @@ const SCENE = (function () {
     for (const [count, size, bright] of starGroups) {
       const pos = new Float32Array(count * 3);
       const col = new Float32Array(count * 3);
+      const pha = new Float32Array(count);
       for (let i = 0; i < count; i++) {
         const u = rng() * 2 - 1, ph = rng() * Math.PI * 2;
         const rr = Math.sqrt(1 - u * u);
@@ -436,17 +474,40 @@ const SCENE = (function () {
         else if (t < 0.3) { r = 1; g = 0.72; b = 0.6; }
         const v = (0.55 + rng() * 0.45) * bright;
         col[i * 3] = r * v; col[i * 3 + 1] = g * v; col[i * 3 + 2] = b * v;
+        pha[i] = rng() * 6.2832;
       }
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-      const mat = new THREE.PointsMaterial({
-        size, sizeAttenuation: false, map: TEX.markerTex, transparent: true,
-        vertexColors: true, depthWrite: false, blending: THREE.AdditiveBlending
+      geo.setAttribute('phase', new THREE.BufferAttribute(pha, 1));
+      const mat = new THREE.ShaderMaterial({
+        uniforms: { uTime: starTwinkle, uSize: { value: size }, uMap: { value: TEX.markerTex } },
+        vertexShader: STAR_VERT, fragmentShader: STAR_FRAG,
+        transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
       });
       const p = new THREE.Points(geo, mat);
       p.renderOrder = -9;
+      p.frustumCulled = false;
       scene.add(p);
+    }
+
+    /* shooting stars: brief additive streaks that cross the sky now and then */
+    meteors = [];
+    for (let i = 0; i < 8; i++) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(6), 3));
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+        vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+      }));
+      line.frustumCulled = false;
+      line.renderOrder = 3;
+      line.visible = false;
+      scene.add(line);
+      meteors.push({
+        line, pos: new THREE.Vector3(), vel: new THREE.Vector3(), color: new THREE.Color(),
+        len: 1, life: 1, age: 0, active: false, delay: 1 + Math.random() * 8
+      });
     }
 
     /* lighting */
@@ -479,6 +540,32 @@ const SCENE = (function () {
     sunCorona.scale.set(60, 60, 1);
     sunCorona.renderOrder = 5;
     sunGroup.add(sunCorona);
+
+    /* solar prominences: glowing plasma loops anchored at the limb that
+       flicker and breathe, with the odd one flaring up */
+    sunProms = [];
+    const promRng = NZ.mulberry32(4242);
+    for (let i = 0; i < 9; i++) {
+      const R = sunDef.dispRad * (0.32 + promRng() * 0.5);
+      const tube = R * (0.05 + promRng() * 0.06);
+      const arc = Math.PI * (0.62 + promRng() * 0.6);
+      const geo = new THREE.TorusGeometry(R, tube, 8, 44, arc);
+      const mat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL(0.025 + promRng() * 0.04, 1.0, 0.6),
+        transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.rotation.z = Math.PI / 2 - arc / 2;        /* centre the apex on +Y */
+      const holder = new THREE.Group();
+      const dir = new THREE.Vector3().setFromSphericalCoords(1, Math.acos(2 * promRng() - 1), promRng() * 6.2832);
+      holder.position.copy(dir).multiplyScalar(sunDef.dispRad * 0.96);
+      holder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+      holder.rotateY(promRng() * 6.2832);             /* random tangential heading */
+      holder.add(mesh);
+      sunGroup.add(holder);
+      sunProms.push({ mat, holder, base: 0.32 + promRng() * 0.3, phase: promRng() * 6.2832, freq: 0.5 + promRng() * 1.1 });
+    }
+
     scene.add(sunGroup);
     registerBody(sunDef, sunGroup, sunMesh, null);
 
@@ -765,6 +852,50 @@ const SCENE = (function () {
 
   const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3();
   const _m = new THREE.Object3D();
+  const _vm1 = new THREE.Vector3(), _vm2 = new THREE.Vector3();
+
+  function updateMeteors(dt) {
+    const camPos = camRef.position;
+    for (const m of meteors) {
+      if (!m.active) {
+        m.delay -= dt;
+        if (m.delay > 0) continue;
+        const dir = _vm1.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+        if (dir.lengthSq() < 1e-4) dir.set(1, 0, 0);
+        dir.normalize();
+        const dist = 1400 + Math.random() * 3200;
+        m.pos.copy(camPos).addScaledVector(dir, dist);
+        const vdir = _vm2.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+        vdir.addScaledVector(dir, -vdir.dot(dir));            /* tangential to the line of sight */
+        if (vdir.lengthSq() < 1e-4) vdir.set(dir.y, -dir.x, 0);
+        vdir.normalize();
+        m.vel.copy(vdir).multiplyScalar(dist * (1.0 + Math.random() * 1.4));
+        m.len = dist * (0.08 + Math.random() * 0.06);
+        m.life = 0.5 + Math.random() * 0.7;
+        m.age = 0; m.active = true;
+        const warm = Math.random();
+        m.color.setRGB(warm < 0.7 ? 0.8 : 1.0, 0.92, warm < 0.7 ? 1.0 : 0.72);
+        m.line.visible = true;
+      }
+      m.age += dt;
+      if (m.age >= m.life) {
+        m.active = false; m.line.visible = false;
+        m.delay = 2.5 + Math.random() * 9;
+        continue;
+      }
+      m.pos.addScaledVector(m.vel, dt);
+      const f = 1 - m.age / m.life;
+      const tail = _vm1.copy(m.vel).normalize().multiplyScalar(-m.len * f);
+      const p = m.line.geometry.attributes.position.array;
+      const c = m.line.geometry.attributes.color.array;
+      p[0] = m.pos.x; p[1] = m.pos.y; p[2] = m.pos.z;
+      p[3] = m.pos.x + tail.x; p[4] = m.pos.y + tail.y; p[5] = m.pos.z + tail.z;
+      const b = f * f;
+      c[0] = m.color.r * b; c[1] = m.color.g * b; c[2] = m.color.b * b;
+      m.line.geometry.attributes.position.needsUpdate = true;
+      m.line.geometry.attributes.color.needsUpdate = true;
+    }
+  }
 
   function update(simJD, dtReal, timeScale) {
     const simDays = simJD - ORB.J2000;
@@ -801,8 +932,19 @@ const SCENE = (function () {
 
     /* sun surface + glow flicker */
     sunUniforms.uTime.value += dtReal;
-    const pulse = 1 + Math.sin(sunUniforms.uTime.value * 1.7) * 0.012;
+    const sunT = sunUniforms.uTime.value;
+    const pulse = 1 + Math.sin(sunT * 1.7) * 0.012;
     sunCore.scale.set(26 * pulse, 26 * pulse, 1);
+
+    /* prominences flicker/breathe; twinkling stars + shooting stars advance */
+    for (const pr of sunProms) {
+      const flick = pr.base * (0.5 + 0.5 * Math.sin(sunT * pr.freq + pr.phase))
+        + 0.14 * Math.max(0, Math.sin(sunT * pr.freq * 0.37 + pr.phase));
+      pr.mat.opacity = Math.max(0.04, flick);
+      pr.holder.scale.setScalar(1 + 0.1 * Math.sin(sunT * pr.freq * 0.8 + pr.phase));
+    }
+    starTwinkle.value = sunT;
+    updateMeteors(dtReal);
 
     /* earth day/night terminator + animated clouds/auroras */
     if (earthUniforms) {
