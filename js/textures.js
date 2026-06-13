@@ -727,6 +727,111 @@ const TEX = (function () {
     return toTexture(cv);
   }
 
+  /* ---------- galaxies (face-on textures; 3D tilt handles inclination) ---------- */
+
+  function texGalaxy(opts) {
+    opts = opts || {};
+    const S = 512, cx = S / 2, cy = S / 2;
+    const { cv, ctx } = makeCanvas(S, S);
+    ctx.clearRect(0, 0, S, S);
+    const rng = mulberry32(opts.seed || 1);
+    const type = opts.type || 'spiral';
+    const coreCol = opts.core || '255,238,200';
+    const armCol = opts.arm || '170,200,255';
+    const hiiCol = opts.hii || '255,150,190';
+    ctx.globalCompositeOperation = 'lighter';
+
+    /* faint disk haze */
+    const hz = ctx.createRadialGradient(cx, cy, 0, cx, cy, S * 0.48);
+    hz.addColorStop(0, `rgba(${coreCol},0.45)`);
+    hz.addColorStop(0.3, `rgba(${armCol},0.10)`);
+    hz.addColorStop(1, `rgba(${armCol},0)`);
+    ctx.fillStyle = hz; ctx.fillRect(0, 0, S, S);
+
+    if (type === 'elliptical') {
+      for (let i = 0; i < 4; i++) {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, S * (0.16 + i * 0.1));
+        g.addColorStop(0, `rgba(${coreCol},${0.4 - i * 0.08})`);
+        g.addColorStop(1, `rgba(${coreCol},0)`);
+        ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+      }
+      for (let i = 0; i < 1500; i++) {
+        const a = rng() * 6.2832, rr = Math.pow(rng(), 0.6) * S * 0.44;
+        const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr * 0.78;
+        ctx.fillStyle = `rgba(255,242,214,${0.12 + rng() * 0.28})`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    } else if (type === 'irregular') {
+      for (let k = 0; k < 16; k++) {
+        const bx = cx + (rng() - 0.5) * S * 0.62, by = cy + (rng() - 0.5) * S * 0.5;
+        const br = 12 + rng() * 46, hii = rng() < 0.4;
+        const g = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+        g.addColorStop(0, `rgba(${hii ? hiiCol : armCol},${0.16 + rng() * 0.22})`);
+        g.addColorStop(1, `rgba(${hii ? hiiCol : armCol},0)`);
+        ctx.fillStyle = g; ctx.fillRect(bx - br, by - br, br * 2, br * 2);
+      }
+      for (let i = 0; i < 1600; i++) {
+        const x = cx + (rng() - 0.5) * S * 0.72, y = cy + (rng() - 0.5) * S * 0.6;
+        ctx.fillStyle = `rgba(${armCol},${0.08 + rng() * 0.4})`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    } else {
+      /* spiral / barred */
+      const arms = opts.arms || 2, turns = opts.turns || 3.0;
+      const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, S * 0.17);
+      core.addColorStop(0, `rgba(${coreCol},0.98)`);
+      core.addColorStop(0.5, `rgba(${coreCol},0.5)`);
+      core.addColorStop(1, `rgba(${coreCol},0)`);
+      ctx.fillStyle = core; ctx.fillRect(0, 0, S, S);
+      if (opts.barred) {
+        ctx.save();
+        ctx.translate(cx, cy); ctx.rotate(0.3);
+        const bg = ctx.createLinearGradient(-S * 0.2, 0, S * 0.2, 0);
+        bg.addColorStop(0, `rgba(${coreCol},0)`);
+        bg.addColorStop(0.5, `rgba(${coreCol},0.55)`);
+        bg.addColorStop(1, `rgba(${coreCol},0)`);
+        ctx.fillStyle = bg; ctx.fillRect(-S * 0.2, -S * 0.045, S * 0.4, S * 0.09);
+        ctx.restore();
+      }
+      for (let arm = 0; arm < arms; arm++) {
+        const off = arm / arms * 6.2832;
+        for (let t = 0; t < 1; t += 0.0035) {
+          const th = t * turns * 6.2832;
+          const rr = S * 0.07 + t * S * 0.4;
+          const ang = off + th;
+          const x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr;
+          const spread = 3 + t * 16;
+          for (let s = 0; s < 2; s++) {
+            const sx = x + (rng() - 0.5) * spread, sy = y + (rng() - 0.5) * spread;
+            const bright = (1 - t * 0.65) * (0.35 + rng() * 0.6);
+            ctx.fillStyle = `rgba(${armCol},${bright * 0.5})`;
+            ctx.fillRect(sx, sy, 1.4, 1.4);
+          }
+          if (rng() < 0.035) {
+            const hr = 2 + rng() * 5;
+            const hg = ctx.createRadialGradient(x, y, 0, x, y, hr);
+            hg.addColorStop(0, `rgba(${hiiCol},${0.5 * (1 - t)})`);
+            hg.addColorStop(1, `rgba(${hiiCol},0)`);
+            ctx.fillStyle = hg; ctx.fillRect(x - hr, y - hr, hr * 2, hr * 2);
+          }
+        }
+      }
+    }
+
+    /* equatorial dust lane (Sombrero / Centaurus A) */
+    if (opts.dust) {
+      ctx.globalCompositeOperation = 'source-over';
+      const dg = ctx.createLinearGradient(0, cy - S * 0.5, 0, cy + S * 0.5);
+      dg.addColorStop(0.42, 'rgba(8,6,10,0)');
+      dg.addColorStop(0.50, 'rgba(5,3,7,0.88)');
+      dg.addColorStop(0.58, 'rgba(8,6,10,0)');
+      ctx.fillStyle = dg; ctx.fillRect(0, 0, S, S);
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    return toTexture(cv, false);
+  }
+
   /* ---------- rings ---------- */
 
   function texSaturnRings() {
@@ -925,6 +1030,6 @@ const TEX = (function () {
 
   return {
     setAniso, registry, texEarth, texSaturnRings, texUranusRings, texMilkyWay,
-    spriteGlow, spriteSun, spriteDot, toTexture, makeCanvas
+    texGalaxy, spriteGlow, spriteSun, spriteDot, toTexture, makeCanvas
   };
 })();

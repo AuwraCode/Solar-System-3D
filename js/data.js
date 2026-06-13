@@ -721,6 +721,178 @@ const DATA = (function () {
         'Far beyond it lies the hypothetical Oort Cloud, stretching halfway to the next star.',
         'Some astronomers suspect an undiscovered "Planet Nine" shepherds the belt’s strange orbits.'
       ]
+    },
+    {
+      id: 'andromeda', name: 'Andromeda Galaxy', kind: 'galaxy', color: 0xcdd6ff,
+      dispRad: 540, sky: { lon: 40, lat: 26, dist: 11000 },
+      galaxy: { type: 'spiral', seed: 11, incl: 74, arms: 2, turns: 3.0, spin: 0.025,
+        core: '255,236,200', arm: '150,190,255', hii: '255,150,190' },
+      rows: [
+        ['Designation', 'Messier 31 / NGC 224'],
+        ['Type', 'Barred spiral (SA(s)b)'],
+        ['Distance', '2.5 million light-years'],
+        ['Diameter', '~152,000 light-years'],
+        ['Stars', '~1 trillion'],
+        ['Constellation', 'Andromeda']
+      ],
+      blurb: 'The nearest major galaxy to our own and the most distant thing visible to the naked eye. Andromeda is racing toward the Milky Way and will merge with it in about 4.5 billion years.',
+      fun: [
+        'Its light left 2.5 million years ago — you are seeing it as it was before modern humans existed.',
+        'It holds about twice as many stars as the Milky Way.',
+        'When it collides with us, the two will eventually form a single elliptical galaxy nicknamed "Milkomeda".'
+      ]
+    },
+    {
+      id: 'triangulum', name: 'Triangulum Galaxy', kind: 'galaxy', color: 0xbfd0ff,
+      dispRad: 360, sky: { lon: 62, lat: 16, dist: 11600 },
+      galaxy: { type: 'spiral', seed: 23, incl: 56, arms: 2, turns: 3.4, spin: 0.03,
+        core: '255,234,198', arm: '160,196,255', hii: '255,140,180' },
+      rows: [
+        ['Designation', 'Messier 33 / NGC 598'],
+        ['Type', 'Spiral (SA(s)cd)'],
+        ['Distance', '2.7 million light-years'],
+        ['Diameter', '~60,000 light-years'],
+        ['Constellation', 'Triangulum']
+      ],
+      blurb: 'The third-largest member of our Local Group of galaxies, a delicate face-on spiral bursting with star-forming nebulae — including NGC 604, one of the largest known.',
+      fun: [
+        'Under very dark skies, sharp-eyed observers can just glimpse it without a telescope.',
+        'It may be a distant satellite of the Andromeda Galaxy.',
+        'It has no central bulge or supermassive black hole worth the name — unusual for a big spiral.'
+      ]
+    },
+    {
+      id: 'whirlpool', name: 'Whirlpool Galaxy', kind: 'galaxy', color: 0xd6dcff,
+      dispRad: 300, sky: { lon: 205, lat: 54, dist: 13200 },
+      galaxy: { type: 'spiral', seed: 51, incl: 22, arms: 2, turns: 2.6, spin: 0.035,
+        core: '255,240,206', arm: '150,186,255', hii: '255,150,190' },
+      rows: [
+        ['Designation', 'Messier 51a / NGC 5194'],
+        ['Type', 'Grand-design spiral'],
+        ['Distance', '~31 million light-years'],
+        ['Diameter', '~76,000 light-years'],
+        ['Constellation', 'Canes Venatici']
+      ],
+      blurb: 'The classic "grand-design" spiral — its sweeping arms are textbook-perfect, stirred up by a small companion galaxy (NGC 5195) tugging at one arm.',
+      fun: [
+        'It was the first galaxy ever recognised to have spiral structure, by Lord Rosse in 1845.',
+        'The ongoing collision with its little companion is what makes its arms so sharp and bright.',
+        'It is a favourite target for backyard telescopes in the handle of the Big Dipper.'
+      ]
+    },
+    {
+      id: 'pinwheel', name: 'Pinwheel Galaxy', kind: 'galaxy', color: 0xd0dbff,
+      dispRad: 400, sky: { lon: 158, lat: 60, dist: 13800 },
+      galaxy: { type: 'spiral', seed: 101, incl: 18, arms: 4, turns: 2.4, spin: 0.03,
+        core: '255,238,202', arm: '156,192,255', hii: '255,148,188' },
+      rows: [
+        ['Designation', 'Messier 101 / NGC 5457'],
+        ['Type', 'Face-on spiral (SAB(rs)cd)'],
+        ['Distance', '~21 million light-years'],
+        ['Diameter', '~170,000 light-years'],
+        ['Constellation', 'Ursa Major']
+      ],
+      blurb: 'A huge, near-perfectly face-on spiral about 70% larger than the Milky Way, freckled with giant glowing star-forming regions across its sprawling arms.',
+      fun: [
+        'It is one of the biggest disk galaxies known in our cosmic neighbourhood.',
+        'Its arms are noticeably lopsided, likely from past gravitational encounters.',
+        'A bright supernova flared in it in 2011, visible in amateur telescopes.'
+      ]
+    },
+    {
+      id: 'sombrero', name: 'Sombrero Galaxy', kind: 'galaxy', color: 0xe6d8b8,
+      dispRad: 320, sky: { lon: 252, lat: -28, dist: 12500 },
+      galaxy: { type: 'elliptical', seed: 104, incl: 84, roll: 0, dust: true, spin: 0,
+        core: '255,236,196' },
+      rows: [
+        ['Designation', 'Messier 104 / NGC 4594'],
+        ['Type', 'Edge-on spiral / lenticular'],
+        ['Distance', '~31 million light-years'],
+        ['Diameter', '~49,000 light-years'],
+        ['Constellation', 'Virgo']
+      ],
+      blurb: 'Seen almost perfectly edge-on, this galaxy’s brilliant bulge and dark dust lane give it the look of a wide-brimmed hat — hence the name.',
+      fun: [
+        'Its core hides a supermassive black hole of about a billion Suns.',
+        'It is wrapped in an unusually rich swarm of nearly 2,000 globular star clusters.',
+        'The sharp dust lane is a ring of cold gas circling the galaxy edge-on to us.'
+      ]
+    },
+    {
+      id: 'centaurusa', name: 'Centaurus A', kind: 'galaxy', color: 0xe2d2bc,
+      dispRad: 340, sky: { lon: 292, lat: -44, dist: 10600 },
+      galaxy: { type: 'elliptical', seed: 5128, incl: 68, roll: 0, dust: true, spin: 0.006,
+        core: '255,232,196' },
+      rows: [
+        ['Designation', 'NGC 5128'],
+        ['Type', 'Peculiar elliptical (active galaxy)'],
+        ['Distance', '~12 million light-years'],
+        ['Diameter', '~98,000 light-years'],
+        ['Constellation', 'Centaurus']
+      ],
+      blurb: 'The nearest active galaxy — a giant elliptical crossed by a dark dust lane, the wreckage of a spiral galaxy it swallowed. Its core blasts huge radio jets into space.',
+      fun: [
+        'It is one of the brightest radio sources in the entire sky.',
+        'Twin jets from its central black hole stretch over a million light-years.',
+        'The warped dust lane is the digesting remains of a smaller galaxy it ate.'
+      ]
+    },
+    {
+      id: 'lmc', name: 'Large Magellanic Cloud', kind: 'galaxy', color: 0xcfe0ff,
+      dispRad: 320, sky: { lon: 280, lat: -66, dist: 7000 },
+      galaxy: { type: 'irregular', seed: 70, incl: 38, spin: 0.012,
+        arm: '170,200,255', hii: '255,150,180' },
+      rows: [
+        ['Type', 'Barred irregular dwarf'],
+        ['Distance', '163,000 light-years'],
+        ['Diameter', '~32,000 light-years'],
+        ['Constellation', 'Dorado / Mensa'],
+        ['Status', 'Satellite of the Milky Way']
+      ],
+      blurb: 'The largest satellite galaxy of the Milky Way, a ragged cloud of stars best seen from the southern hemisphere. It hosts the Tarantula Nebula, the most active star-forming region known nearby.',
+      fun: [
+        'Supernova 1987A, the closest observed supernova in modern times, flared here.',
+        'It looks like a detached piece of the Milky Way to the naked eye.',
+        'Ferdinand Magellan’s crew helped bring it to European attention in 1519.'
+      ]
+    },
+    {
+      id: 'smc', name: 'Small Magellanic Cloud', kind: 'galaxy', color: 0xc8daff,
+      dispRad: 210, sky: { lon: 305, lat: -62, dist: 7300 },
+      galaxy: { type: 'irregular', seed: 71, incl: 46, spin: 0.012,
+        arm: '176,204,255', hii: '255,156,184' },
+      rows: [
+        ['Type', 'Irregular dwarf'],
+        ['Distance', '200,000 light-years'],
+        ['Diameter', '~18,900 light-years'],
+        ['Constellation', 'Tucana'],
+        ['Status', 'Satellite of the Milky Way']
+      ],
+      blurb: 'A smaller companion cloud to the LMC, the two linked by a bridge of gas torn out by the Milky Way’s gravity as they slowly fall toward us.',
+      fun: [
+        'It and the LMC trail a vast "Magellanic Stream" of gas halfway around our sky.',
+        'It helped astronomer Henrietta Leavitt discover how to measure cosmic distances in 1908.',
+        'Both Clouds may only be passing by, not permanently bound to the Milky Way.'
+      ]
+    },
+    {
+      id: 'm87', name: 'Messier 87', kind: 'galaxy', color: 0xf0e4c4,
+      dispRad: 440, sky: { lon: 186, lat: 12, dist: 16000 },
+      galaxy: { type: 'elliptical', seed: 87, incl: 12, spin: 0,
+        core: '255,238,200' },
+      rows: [
+        ['Designation', 'Messier 87 / Virgo A'],
+        ['Type', 'Supergiant elliptical'],
+        ['Distance', '~53 million light-years'],
+        ['Diameter', '~120,000 light-years'],
+        ['Constellation', 'Virgo']
+      ],
+      blurb: 'A monstrous elliptical galaxy at the heart of the Virgo Cluster, home to the first black hole ever directly imaged (2019) and a brilliant jet of plasma thousands of light-years long.',
+      fun: [
+        'Its central black hole, M87*, weighs 6.5 billion Suns and was photographed by the Event Horizon Telescope.',
+        'It contains an estimated 12,000 globular clusters, dwarfing the Milky Way’s ~150.',
+        'Its blue jet, blasted from the black hole, is visible even in modest telescopes.'
+      ]
     }
   ];
 

@@ -54,7 +54,7 @@ const UI = (function () {
   }
 
   function kindLabel(def) {
-    return { star: 'Star', planet: 'Planet', dwarf: 'Dwarf planet', moon: 'Moon', comet: 'Comet', craft: 'Spacecraft', region: 'Region' }[def.kind] || '';
+    return { star: 'Star', planet: 'Planet', dwarf: 'Dwarf planet', moon: 'Moon', comet: 'Comet', craft: 'Spacecraft', region: 'Region', galaxy: 'Galaxy' }[def.kind] || '';
   }
 
   function cssColor(c) { return '#' + c.toString(16).padStart(6, '0'); }
@@ -67,7 +67,8 @@ const UI = (function () {
       ['Moons', d => d.kind === 'moon'],
       ['Spacecraft', d => d.kind === 'craft'],
       ['Comets', d => d.kind === 'comet'],
-      ['Regions', d => d.kind === 'region']
+      ['Regions', d => d.kind === 'region'],
+      ['Galaxies', d => d.kind === 'galaxy']
     ];
     const box = $('navList');
     box.innerHTML = '';

@@ -845,6 +845,39 @@ const SCENE = (function () {
       rt.dispRad = def.id === 'belt' ? 5 : 60;
     }
 
+    /* galaxies — distant disks on the celestial sphere, facing the inner system */
+    progress('Hanging the distant galaxies…');
+    await tick();
+    for (const def of DATA.bodies.filter(d => d.kind === 'galaxy')) {
+      const group = new THREE.Group();
+      const dir = ORB.eclDir(def.sky.lon, def.sky.lat);
+      group.position.copy(dir).multiplyScalar(def.sky.dist);
+      const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(def.dispRad * 2, def.dispRad * 2),
+        new THREE.MeshBasicMaterial({
+          map: TEX.texGalaxy(def.galaxy), transparent: true, side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending, depthWrite: false
+        })
+      );
+      plane.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.clone().negate());
+      const roll = def.galaxy.roll !== undefined ? def.galaxy.roll : NZ.hash2(def.id.length * 5, 7, 3) * 6.2832;
+      plane.rotateZ(roll);
+      plane.rotateX(THREE.MathUtils.degToRad(def.galaxy.incl || 0));
+      group.add(plane);
+      const core = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: TEX.spriteGlow('rgba(255,246,220,1)', 'rgba(255,222,166,0.5)'),
+        color: 0xfff2d6, transparent: true, opacity: 0.85, depthWrite: false,
+        blending: THREE.AdditiveBlending
+      }));
+      core.scale.set(def.dispRad * 0.85, def.dispRad * 0.85, 1);
+      group.add(core);
+      scene.add(group);
+      const rt = registerBody(def, group, plane, null);
+      rt.galaxyPlane = plane;
+      rt.galaxySpin = def.galaxy.spin || 0;
+      hitSphere(rt, def.dispRad * 0.85);
+    }
+
     progress('Ready');
   }
 
@@ -928,6 +961,7 @@ const SCENE = (function () {
         b.group.position.copy(b.rayDir).multiplyScalar(r * DATA.AU);
         b.model.lookAt(0, 0, 0);
       }
+      if (def.kind === 'galaxy' && b.galaxySpin) b.galaxyPlane.rotateZ(b.galaxySpin * dtReal);
     }
 
     /* sun surface + glow flicker */
@@ -1047,7 +1081,7 @@ const SCENE = (function () {
         b.marker.scale.set(mScale, mScale, 1);
         let op = NZ.clamp((11 - meshPx) / 8, 0, 1) * 0.85;
         if (!sysVis) op = 0;
-        if (b.def.kind === 'star') op = 0;
+        if (b.def.kind === 'star' || b.def.kind === 'galaxy') op = 0;
         b.marker.material.opacity = op;
         b.marker.visible = op > 0.02;
       }
@@ -1062,6 +1096,7 @@ const SCENE = (function () {
             const sy = (-_v1.y * 0.5 + 0.5) * h - Math.max(10, meshPx * 0.85) - 6;
             let pri = 30;
             if (b.def.kind === 'star') pri = 95;
+            else if (b.def.kind === 'galaxy') pri = 48;
             else if (b.def.kind === 'planet') pri = 60 + b.dispRad;
             else if (b.def.kind === 'dwarf') pri = 40;
             else if (b.def.kind === 'comet') pri = 36;
