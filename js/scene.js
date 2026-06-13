@@ -83,11 +83,12 @@ const SCENE = (function () {
     }`;
 
   const EARTH_VERT = `
-    varying vec2 vUv; varying vec3 vNw; varying vec3 vWp;
+    varying vec2 vUv; varying vec3 vNw; varying vec3 vWp; varying float vLat;
     ${LOGDEPTH_V}
     void main(){
       vUv = uv;
       vNw = normalize(mat3(modelMatrix) * normal);
+      vLat = normalize(position).y;          /* sin(geographic latitude) */
       vec4 wp = modelMatrix * vec4(position, 1.0);
       vWp = wp.xyz;
       gl_Position = projectionMatrix * viewMatrix * wp;
@@ -96,28 +97,62 @@ const SCENE = (function () {
 
   const EARTH_FRAG = `
     uniform sampler2D dayMap; uniform sampler2D nightMap; uniform sampler2D specMap;
-    uniform vec3 sunDir;
-    varying vec2 vUv; varying vec3 vNw; varying vec3 vWp;
+    uniform sampler2D heightMap; uniform sampler2D cloudMap;
+    uniform vec3 sunDir; uniform float uTime; uniform vec2 texel;
+    varying vec2 vUv; varying vec3 vNw; varying vec3 vWp; varying float vLat;
     ${LOGDEPTH_F}
     /* sRGB maps are hardware-decoded to linear; encode our output back manually
        (three's encodings chunk is unavailable inside ShaderMaterial in r147) */
     vec3 lin2srgb(vec3 c){ return pow(max(c, vec3(0.0)), vec3(0.4545)); }
+    float ahash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float anoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+      return mix(mix(ahash(i), ahash(i+vec2(1,0)), f.x),
+                 mix(ahash(i+vec2(0,1)), ahash(i+vec2(1,1)), f.x), f.y); }
+    float afbm(vec2 p){ float s=0.0, a=0.5; for(int i=0;i<4;i++){ s+=a*anoise(p); p*=2.0; a*=0.5; } return s; }
     void main(){
       ${LOGDEPTH_F_MAIN}
-      vec3 N = normalize(vNw);
-      float ndl = dot(N, sunDir);
-      float dayMix = smoothstep(-0.06, 0.22, ndl);
+      vec3 Ng = normalize(vNw);
+      float ocean = texture2D(specMap, vUv).r;
+      /* tangent frame on the sphere, for height-field bump + cloud shadows */
+      vec3 up = abs(Ng.y) > 0.99 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+      vec3 east = normalize(cross(up, Ng));
+      vec3 north = cross(Ng, east);
+      float hL = texture2D(heightMap, vUv - vec2(texel.x, 0.0)).r;
+      float hR = texture2D(heightMap, vUv + vec2(texel.x, 0.0)).r;
+      float hD = texture2D(heightMap, vUv - vec2(0.0, texel.y)).r;
+      float hU = texture2D(heightMap, vUv + vec2(0.0, texel.y)).r;
+      float bump = (1.0 - ocean) * 2.4;       /* relief on land only */
+      vec3 N = normalize(Ng - (east * (hR - hL) + north * (hU - hD)) * bump);
+
+      float dayMix = smoothstep(-0.06, 0.22, dot(Ng, sunDir));
       vec3 day = texture2D(dayMap, vUv).rgb;
       vec3 night = texture2D(nightMap, vUv).rgb;
-      float ocean = texture2D(specMap, vUv).r;
+      /* clouds drifting overhead cast soft shadows toward the terminator */
+      vec2 sunUv = vec2(dot(sunDir, east), dot(sunDir, north)) * texel * 7.0;
+      float cloudHere = texture2D(cloudMap, vUv).g;
+      float cloudShadow = texture2D(cloudMap, vUv - sunUv).g;
+
+      float diff = max(dot(N, sunDir), 0.0);
+      vec3 col = day * (0.05 + 1.3 * diff * (1.0 - cloudShadow * 0.55));
+      col += night * 1.7 * (1.0 - dayMix) * (1.0 - cloudHere * 0.8);
       vec3 V = normalize(cameraPosition - vWp);
-      vec3 H = normalize(sunDir + V);
-      float spec = pow(max(dot(N, H), 0.0), 60.0) * ocean * dayMix;
-      float fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
-      vec3 col = day * (0.06 + 1.3*dayMix)
-               + night * 1.6 * (1.0 - dayMix)
-               + vec3(0.10,0.22,0.65) * fres * (0.18 + 0.5*dayMix)
-               + vec3(1.0,0.95,0.85) * spec * 0.4;
+      vec3 Hh = normalize(sunDir + V);
+      float spec = pow(max(dot(Ng, Hh), 0.0), 80.0) * ocean * dayMix;
+      col += vec3(1.0, 0.96, 0.86) * spec * 0.7;
+      float fres = pow(1.0 - max(dot(Ng, V), 0.0), 3.0);
+      col += vec3(0.16, 0.36, 0.92) * fres * (0.16 + 0.5 * dayMix);
+
+      /* auroras: green/violet curtains over the night-side poles */
+      float polar = smoothstep(0.68, 0.94, abs(vLat));
+      float nightf = 1.0 - dayMix;
+      if (polar * nightf > 0.001) {
+        float au = afbm(vec2(vUv.x * 42.0 + uTime * 0.30, abs(vLat) * 60.0 - uTime * 0.18));
+        au *= afbm(vec2(vUv.x * 12.0 - uTime * 0.12, vLat * 22.0));
+        float curtain = smoothstep(0.34, 0.80, au) + 0.18 * smoothstep(0.2, 0.6, au);
+        vec3 aur = mix(vec3(0.10, 0.95, 0.45), vec3(0.55, 0.22, 0.95),
+                       0.5 + 0.5 * sin(vUv.x * 9.0 + uTime * 0.4));
+        col += aur * curtain * polar * nightf * 1.15;
+      }
       gl_FragColor = vec4(lin2srgb(col), 1.0);
     }`;
 
@@ -464,7 +499,9 @@ const SCENE = (function () {
         const maps = TEX.texEarth();
         earthUniforms = {
           dayMap: { value: maps.day }, nightMap: { value: maps.night },
-          specMap: { value: maps.spec }, sunDir: { value: new THREE.Vector3(1, 0, 0) }
+          specMap: { value: maps.spec }, heightMap: { value: maps.height },
+          cloudMap: { value: maps.clouds }, sunDir: { value: new THREE.Vector3(1, 0, 0) },
+          uTime: { value: 0 }, texel: { value: new THREE.Vector2(1 / 2048, 1 / 1024) }
         };
         mesh = new THREE.Mesh(
           new THREE.SphereGeometry(def.dispRad, 64, 48),
@@ -767,9 +804,10 @@ const SCENE = (function () {
     const pulse = 1 + Math.sin(sunUniforms.uTime.value * 1.7) * 0.012;
     sunCore.scale.set(26 * pulse, 26 * pulse, 1);
 
-    /* earth day/night terminator */
+    /* earth day/night terminator + animated clouds/auroras */
     if (earthUniforms) {
       earthUniforms.sunDir.value.copy(byId.earth.group.position).negate().normalize();
+      earthUniforms.uTime.value = sunUniforms.uTime.value;
     }
 
     /* comets */

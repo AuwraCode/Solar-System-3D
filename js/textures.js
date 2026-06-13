@@ -120,89 +120,174 @@ const TEX = (function () {
     return toTexture(cv);
   }
 
+  /* Coarse real-world continent mask, 96×48 equirect cells (north→south rows).
+     Each row lists [colStart,colEnd] land spans; col 0 = 180°W, col 48 = 0°,
+     so the map reads Pacific · Americas · Atlantic · Africa/Europe · Asia ·
+     Australia. Bilinear-sampled then domain-warped into detailed coastlines. */
+  const EARTH_LAND = [
+    [], [],
+    [[18, 28], [30, 40], [60, 80]],
+    [[14, 30], [29, 42], [50, 52], [58, 85]],
+    [[8, 32], [30, 43], [48, 90]],
+    [[0, 6], [8, 34], [31, 44], [46, 92]],
+    [[0, 7], [8, 36], [32, 45], [46, 94]],
+    [[0, 8], [9, 37], [34, 44], [45, 95]],
+    [[1, 9], [9, 38], [35, 43], [46, 95]],
+    [[2, 9], [8, 39], [44, 60], [60, 95]],
+    [[7, 40], [44, 66], [66, 95]],
+    [[6, 41], [45, 68], [66, 95]],
+    [[6, 42], [46, 70], [70, 95]],
+    [[7, 42], [46, 74], [74, 95]],
+    [[8, 42], [45, 50], [52, 95]],
+    [[9, 41], [44, 62], [62, 95]],
+    [[11, 40], [43, 66], [60, 95]],
+    [[13, 39], [42, 68], [60, 95]],
+    [[14, 37], [41, 70], [67, 90]],
+    [[16, 34], [40, 72], [67, 92]],
+    [[17, 30], [38, 74], [80, 92]],
+    [[18, 28], [37, 76], [82, 92]],
+    [[24, 36], [38, 74], [84, 92]],
+    [[23, 38], [40, 70], [80, 93]],
+    [[22, 39], [42, 66], [80, 94]],
+    [[21, 40], [44, 64], [82, 92]],
+    [[22, 41], [45, 63], [84, 93]],
+    [[23, 41], [46, 62], [84, 90]],
+    [[24, 41], [47, 60], [82, 91]],
+    [[25, 40], [48, 59], [80, 92]],
+    [[26, 40], [49, 58], [80, 92]],
+    [[27, 39], [50, 57], [80, 91]],
+    [[28, 38], [51, 56], [81, 90]],
+    [[29, 37], [52, 55], [83, 89], [92, 94]],
+    [[30, 36], [84, 88], [92, 94]],
+    [[31, 35], [92, 94]],
+    [[31, 34]], [[31, 33]], [[31, 33]], [[31, 32]],
+    [],
+    [[28, 32]],
+    [[0, 95]], [[0, 95]], [[0, 95]], [[0, 95]], [[0, 95]], [[0, 95]]
+  ];
+
   function texEarth() {
-    const W = 1024, H = 512, seed = 7;
-    const day = makeCanvas(W, H), night = makeCanvas(W, H), spec = makeCanvas(W, H);
+    const W = 2048, H = 1024, seed = 7;
+    const GW = 96, GH = 48;
+    const land = new Float32Array(GW * GH);
+    for (let r = 0; r < GH; r++) {
+      for (const [c0, c1] of (EARTH_LAND[r] || [])) {
+        for (let c = c0; c <= c1; c++) land[r * GW + ((c % GW) + GW) % GW] = 1;
+      }
+    }
+    function landAt(u, v) {
+      const fx = u * GW - 0.5, fy = v * GH - 0.5;
+      const x0 = Math.floor(fx), y0 = Math.floor(fy);
+      const tx = fx - x0, ty = fy - y0;
+      const yA = clamp(y0, 0, GH - 1), yB = clamp(y0 + 1, 0, GH - 1);
+      const xA = ((x0 % GW) + GW) % GW, xB = (((x0 + 1) % GW) + GW) % GW;
+      const a = land[yA * GW + xA], b = land[yA * GW + xB];
+      const c = land[yB * GW + xA], d = land[yB * GW + xB];
+      return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty;
+    }
+
+    const day = makeCanvas(W, H), night = makeCanvas(W, H);
+    const spec = makeCanvas(W, H), height = makeCanvas(W, H);
     const di = day.ctx.createImageData(W, H), si = spec.ctx.createImageData(W, H);
-    const dd = di.data, sd = si.data;
-    const coast = [];
+    const hi = height.ctx.createImageData(W, H);
+    const dd = di.data, sd = si.data, hd = hi.data;
+    const lights = [];
+    const rngL = mulberry32(99);
+
     for (let y = 0; y < H; y++) {
       const lat = (0.5 - y / H) * Math.PI;
-      const gy = y / H * 4;
+      const absLat = Math.abs(lat), latDeg = absLat * 57.2958;
+      const v = y / H, gy = v * 6;
       for (let x = 0; x < W; x++) {
-        const gx = x / W * 8;
-        const q1 = fbm2(gx + 5.2, gy + 1.3, 4, 8, seed + 50);
-        const q2 = fbm2(gx + 9.7, gy + 8.1, 4, 8, seed + 60);
-        const n = fbm2(gx + 2.6 * (q1 - 0.5), gy + 2.6 * (q2 - 0.5), 6, 8, seed);
-        const detail = fbm2(gx * 4, gy * 4, 4, 32, seed + 7);
+        const u = x / W, gx = u * 12;
+        /* warp the coarse mask so coastlines turn fractal, not blocky */
+        const wx = fbm2(gx * 0.9 + 11, gy * 0.9 + 3, 3, 12, seed + 1) - 0.5;
+        const wy = fbm2(gx * 0.9 + 31, gy * 0.9 + 7, 3, 12, seed + 2) - 0.5;
+        const cn = fbm2(gx * 2.2, gy * 2.2, 5, 26, seed + 5);
+        let e = landAt(u + wx * 0.028, clamp(v + wy * 0.018, 0, 1));
+        e = clamp(e + (cn - 0.5) * 0.36, 0, 1);
+        const isLand = e > 0.5;
+        const detail = fbm2(gx * 4, gy * 4, 4, 48, seed + 7);
         const i = (y * W + x) * 4;
-        const absLat = Math.abs(lat);
-        const ice = absLat > 1.15 + (n - 0.5) * 0.18;
-        let r, g, b, sv = 0;
-        if (ice) {
-          const v = 225 + detail * 28;
-          r = v; g = v + 3; b = v + 10; sv = 70;
-        } else if (n > 0.52) {
-          const latDeg = absLat * 57.3;
-          const desert = latDeg > 12 && latDeg < 38 && detail > 0.45 && n < 0.60;
-          const cold = latDeg > 52;
-          const mountain = n > 0.615;
+        let r, g, b, sv, hv;
+
+        if (isLand && (absLat > 1.20 + (cn - 0.5) * 0.12 || (latDeg > 62 && e > 0.6))) {
+          /* ice sheets: Antarctica, Greenland, high-Arctic land */
+          const w = 232 + detail * 22; r = w; g = w + 2; b = w + 8; sv = 60; hv = 150 + e * 60;
+        } else if (isLand) {
+          const mtn = fbm2(gx * 3 + 5, gy * 3 + 2, 4, 36, seed + 9);
+          const mountain = e > 0.62 && mtn > 0.60;
+          const desert = latDeg > 14 && latDeg < 34 && detail > 0.42 && cn < 0.62;
+          const cold = latDeg > 50;
+          const elevH = clamp((e - 0.5) * 2, 0, 1);
           if (mountain) {
-            const v = (n - 0.615) * 900;
-            r = 124 + v + detail * 30; g = 112 + v + detail * 26; b = 96 + v + detail * 22;
+            const m = (mtn - 0.6) * 700;
+            r = 130 + m + detail * 26; g = 120 + m + detail * 22; b = 104 + m + detail * 20;
+            hv = 180 + elevH * 60 + mtn * 30;
           } else if (desert) {
-            r = 186 + detail * 36; g = 156 + detail * 30; b = 100 + detail * 22;
+            r = 192 + detail * 34; g = 160 + detail * 28; b = 104 + detail * 20; hv = 120 + elevH * 40;
           } else if (cold) {
-            r = 64 + detail * 26; g = 86 + detail * 30; b = 56 + detail * 20;
+            r = 70 + detail * 26; g = 92 + detail * 30; b = 58 + detail * 20; hv = 116 + elevH * 40;
           } else {
-            r = 56 + detail * 36; g = 104 + detail * 42; b = 46 + detail * 26;
+            r = 58 + detail * 40; g = 110 + detail * 44; b = 50 + detail * 26; hv = 116 + elevH * 50;
           }
-          if (n < 0.555 && Math.random() < 0.012) coast.push([x, y]);
+          sv = 8;
+          /* city lights weighted to temperate, low, non-desert land */
+          const popLat = Math.exp(-Math.pow((lat - 0.78) / 0.5, 2));
+          let w = 0.020 * popLat;
+          if (desert || mountain) w *= 0.25;
+          if (latDeg > 66) w *= 0.08;
+          if (rngL() < w) lights.push([x, y]);
         } else {
-          /* ocean: deeper = darker; bright turquoise shelf along coasts */
-          const depth = clamp((0.52 - n) * 6, 0, 1);
-          if (depth < 0.18) { r = 52 + 56 * (1 - depth / 0.18); g = 130 + 56 * (1 - depth / 0.18); b = 168 + 28 * (1 - depth / 0.18); }
-          else { r = lerp(30, 12, depth); g = lerp(82, 40, depth); b = lerp(156, 100, depth); }
-          sv = 255;
+          /* ocean: turquoise shelves over a darkening abyss, polar sea ice */
+          const shelf = clamp((e - 0.34) * 5, 0, 1);
+          const depth = clamp(cn * 0.55 + (1 - shelf) * 0.45, 0, 1);
+          if (shelf > 0.55) { r = 46 + 52 * shelf; g = 120 + 52 * shelf; b = 160 + 30 * shelf; }
+          else { r = lerp(28, 9, depth); g = lerp(80, 36, depth); b = lerp(152, 96, depth); }
+          if (absLat > 1.30) {
+            const k = smoothstep(1.30, 1.42, absLat) * (0.6 + detail * 0.4);
+            r = lerp(r, 236, k); g = lerp(g, 240, k); b = lerp(b, 246, k);
+          }
+          sv = 255; hv = 64 - depth * 44;
         }
         dd[i] = r; dd[i + 1] = g; dd[i + 2] = b; dd[i + 3] = 255;
         sd[i] = sv; sd[i + 1] = sv; sd[i + 2] = sv; sd[i + 3] = 255;
+        hd[i] = hv; hd[i + 1] = hv; hd[i + 2] = hv; hd[i + 3] = 255;
       }
     }
     day.ctx.putImageData(di, 0, 0);
     spec.ctx.putImageData(si, 0, 0);
+    height.ctx.putImageData(hi, 0, 0);
 
-    /* night side city lights clustered along the coastline samples */
+    /* night side city lights clustered around sampled population points */
     night.ctx.fillStyle = '#000000';
     night.ctx.fillRect(0, 0, W, H);
-    const rng = mulberry32(99);
-    for (const [cx, cy] of coast) {
-      if (rng() > 0.55) continue;
-      const cluster = 2 + (rng() * 10) | 0;
+    const rng = mulberry32(123);
+    for (const [cx, cy] of lights) {
+      const cluster = 2 + (rng() * 8) | 0;
       for (let k = 0; k < cluster; k++) {
-        const x = cx + (rng() - 0.5) * 16, y = cy + (rng() - 0.5) * 9;
-        const r = 0.5 + rng() * 1.3;
-        const g = night.ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
-        g.addColorStop(0, 'rgba(255,214,140,0.9)');
+        const x = cx + (rng() - 0.5) * 24, yy = cy + (rng() - 0.5) * 13;
+        const rr = 0.6 + rng() * 1.7;
+        const g = night.ctx.createRadialGradient(x, yy, 0, x, yy, rr * 2.6);
+        g.addColorStop(0, 'rgba(255,216,150,0.95)');
         g.addColorStop(1, 'rgba(255,180,90,0)');
         night.ctx.fillStyle = g;
-        night.ctx.fillRect(x - r * 3, y - r * 3, r * 6, r * 6);
+        night.ctx.fillRect(x - rr * 3, yy - rr * 3, rr * 6, rr * 6);
       }
     }
 
-    /* clouds: ridged fbm, slight equator + mid-lat banding */
+    /* clouds: ridged fbm with equatorial + mid-latitude storm banding */
     const cl = makeCanvas(W, H);
     const ci = cl.ctx.createImageData(W, H);
     for (let y = 0; y < H; y++) {
       const lat = (0.5 - y / H) * Math.PI;
-      const gy = y / H * 4;
-      const band = 0.78 + 0.45 * Math.cos(lat * 2.2) * Math.cos(lat * 2.2) + 0.2 * Math.cos(lat * 6);
+      const gy = y / H * 5;
+      const band = 0.74 + 0.5 * Math.cos(lat * 2.2) * Math.cos(lat * 2.2) + 0.18 * Math.cos(lat * 6);
       for (let x = 0; x < W; x++) {
-        const gx = x / W * 8;
-        const q = fbm2(gx + 3.1, gy + 6.4, 3, 8, 201);
-        const c = rfbm2(gx * 1.7 + 2.5 * (q - 0.5), gy * 1.7 + 13, 5, 13.6, 202);
-        /* density goes in RGB: three.js alphaMap samples the green channel */
-        const a = smoothstep(0.46, 0.78, c * band) * 235;
+        const gx = x / W * 10;
+        const q = fbm2(gx + 3.1, gy + 6.4, 3, 10, 201);
+        const c = rfbm2(gx * 1.6 + 2.2 * (q - 0.5), gy * 1.6 + 13, 5, 16, 202);
+        const a = smoothstep(0.42, 0.78, c * band) * 240;
         const i = (y * W + x) * 4;
         ci.data[i] = a; ci.data[i + 1] = a; ci.data[i + 2] = a; ci.data[i + 3] = 255;
       }
@@ -213,6 +298,7 @@ const TEX = (function () {
       day: toTexture(day.cv),
       night: toTexture(night.cv),
       spec: toTexture(spec.cv, false),
+      height: toTexture(height.cv, false),
       clouds: toTexture(cl.cv, false)
     };
   }
