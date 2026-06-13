@@ -832,6 +832,68 @@ const TEX = (function () {
     return toTexture(cv, false);
   }
 
+  /* ---------- black holes + nebulae ---------- */
+
+  function texPhotonRing() {
+    const S = 256, c = S / 2;
+    const { cv, ctx } = makeCanvas(S, S);
+    ctx.clearRect(0, 0, S, S);
+    ctx.globalCompositeOperation = 'lighter';
+    const R = S * 0.36, steps = 240;
+    for (let i = 0; i < steps; i++) {
+      const a = i / steps * Math.PI * 2;
+      /* Doppler beaming: the side rotating toward us blazes far brighter */
+      const dop = Math.pow(0.5 + 0.5 * Math.cos(a - Math.PI), 1.6);
+      const inten = 0.25 + 0.95 * dop;
+      ctx.strokeStyle = `rgba(255,${(200 - 40 * (1 - dop)) | 0},${(150 * dop + 40) | 0},${0.85 * inten})`;
+      ctx.lineWidth = S * 0.018 * (0.7 + 0.8 * dop);
+      ctx.beginPath();
+      ctx.arc(c, c, R, a, a + Math.PI * 2 / steps + 0.03);
+      ctx.stroke();
+    }
+    const g = ctx.createRadialGradient(c, c, R * 0.6, c, c, R * 1.8);
+    g.addColorStop(0, 'rgba(255,180,90,0)');
+    g.addColorStop(0.5, 'rgba(255,160,70,0.10)');
+    g.addColorStop(1, 'rgba(255,140,50,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+    return toTexture(cv);
+  }
+
+  function texNebula(opts) {
+    opts = opts || {};
+    const S = 512, c = S / 2;
+    const { cv, ctx } = makeCanvas(S, S);
+    ctx.clearRect(0, 0, S, S);
+    const rng = mulberry32(opts.seed || 1);
+    const cols = opts.cols || ['255,90,150', '120,170,255', '255,170,120'];
+    ctx.globalCompositeOperation = 'lighter';
+    for (let k = 0; k < 30; k++) {
+      const x = c + (rng() - 0.5) * S * 0.72, y = c + (rng() - 0.5) * S * 0.72;
+      const r = 24 + rng() * 130;
+      const col = cols[(rng() * cols.length) | 0];
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${col},${0.05 + rng() * 0.11})`);
+      g.addColorStop(1, `rgba(${col},0)`);
+      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    for (let i = 0; i < 50; i++) {
+      ctx.strokeStyle = `rgba(${cols[(rng() * cols.length) | 0]},${0.05 + rng() * 0.08})`;
+      ctx.lineWidth = 0.6 + rng() * 1.6;
+      ctx.beginPath();
+      let x = rng() * S, y = rng() * S;
+      ctx.moveTo(x, y);
+      for (let s = 0; s < 4; s++) { x += (rng() - 0.5) * 80; y += (rng() - 0.5) * 80; ctx.lineTo(x, y); }
+      ctx.stroke();
+    }
+    for (let i = 0; i < 180; i++) {
+      const x = c + (rng() - 0.5) * S * 0.8, y = c + (rng() - 0.5) * S * 0.8;
+      ctx.fillStyle = `rgba(255,255,${(230 + rng() * 25) | 0},${0.3 + rng() * 0.7})`;
+      const sz = rng() < 0.9 ? 1 : 2;
+      ctx.fillRect(x, y, sz, sz);
+    }
+    return toTexture(cv);
+  }
+
   /* ---------- rings ---------- */
 
   function texSaturnRings() {
@@ -1054,6 +1116,6 @@ const TEX = (function () {
 
   return {
     setAniso, registry, texEarth, texSaturnRings, texUranusRings, texMilkyWay,
-    texGalaxy, spriteGlow, spriteSun, spriteStar, spriteDot, toTexture, makeCanvas
+    texGalaxy, texPhotonRing, texNebula, spriteGlow, spriteSun, spriteStar, spriteDot, toTexture, makeCanvas
   };
 })();

@@ -6,7 +6,7 @@ const SCENE = (function () {
   let root, rendererRef, labelBox, camRef;
   let sunUniforms, earthUniforms, sunCorona, sunCore;
   let beltMesh, beltData, kuiperPts;
-  let sunProms = [], meteors = [];
+  let sunProms = [], meteors = [], bhDisks = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -191,6 +191,39 @@ const SCENE = (function () {
       ${LOGDEPTH_F_MAIN}
       vec4 t = texture2D(uMap, gl_PointCoord);
       gl_FragColor = vec4(vColor, t.a * (0.35 + 0.65*vTw));
+    }`;
+
+  const BH_VERT = `
+    varying vec3 vPos;
+    ${LOGDEPTH_V}
+    void main(){
+      vPos = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      ${LOGDEPTH_V_MAIN}
+    }`;
+
+  const BH_FRAG = `
+    uniform float uTime; uniform float uInner; uniform float uOuter;
+    varying vec3 vPos;
+    ${LOGDEPTH_F}
+    float bh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float bn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+      return mix(mix(bh(i), bh(i+vec2(1,0)), f.x), mix(bh(i+vec2(0,1)), bh(i+vec2(1,1)), f.x), f.y); }
+    float bfbm(vec2 p){ float s=0.0, a=0.5; for(int i=0;i<4;i++){ s+=a*bn(p); p*=2.0; a*=0.5; } return s; }
+    void main(){
+      ${LOGDEPTH_F_MAIN}
+      float r = length(vPos.xy);
+      float t = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
+      float ang = atan(vPos.y, vPos.x);
+      /* logarithmic-spiral turbulence streaming inward over time */
+      float swirl = bfbm(vec2(ang * 2.5 - log(r + 1.0) * 5.0 - uTime * 1.1, t * 5.0 + uTime * 0.2));
+      vec3 hot = vec3(1.0, 0.96, 0.86), mid = vec3(1.0, 0.55, 0.16), cool = vec3(0.66, 0.12, 0.04);
+      vec3 col = mix(hot, mid, smoothstep(0.0, 0.4, t));
+      col = mix(col, cool, smoothstep(0.4, 1.0, t));
+      float doppler = 0.45 + 0.95 * (0.5 + 0.5 * cos(ang - 1.0));
+      float dens = (0.45 + 0.8 * swirl) * smoothstep(1.0, 0.8, t) * smoothstep(0.0, 0.06, t);
+      float bright = dens * doppler;
+      gl_FragColor = vec4(col * bright * 1.7, clamp(bright * 1.25, 0.0, 1.0));
     }`;
 
   /* ---------- helpers ---------- */
@@ -924,6 +957,61 @@ const SCENE = (function () {
       scene.add(line);
     }
 
+    /* black holes — event horizon shadow + swirling accretion disk + photon ring */
+    progress('Warping spacetime…');
+    await tick();
+    bhDisks = [];
+    const ringTex = TEX.texPhotonRing();
+    for (const def of DATA.bodies.filter(d => d.kind === 'blackhole')) {
+      const bh = def.bh;
+      const group = new THREE.Group();
+      group.position.copy(ORB.eclDir(bh.ra, bh.dec)).multiplyScalar(bh.dist);
+      const Rsh = def.dispRad * 0.5;
+      const horizon = new THREE.Mesh(new THREE.SphereGeometry(Rsh, 32, 24),
+        new THREE.MeshBasicMaterial({ color: 0x000000 }));
+      horizon.renderOrder = 1;
+      group.add(horizon);
+      const uni = { uTime: { value: 0 }, uInner: { value: Rsh * 1.25 }, uOuter: { value: Rsh * 4.2 } };
+      const disk = new THREE.Mesh(
+        new THREE.RingGeometry(Rsh * 1.25, Rsh * 4.2, 160, 8),
+        new THREE.ShaderMaterial({
+          vertexShader: BH_VERT, fragmentShader: BH_FRAG, uniforms: uni,
+          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+        })
+      );
+      disk.rotation.x = THREE.MathUtils.degToRad(bh.tilt || 72);
+      disk.rotation.z = NZ.hash2(def.id.length * 3, 5, 2) * 6.2832;
+      disk.renderOrder = 2;
+      group.add(disk);
+      bhDisks.push(uni);
+      const ring = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: ringTex, color: new THREE.Color(bh.disk || '#ffd0a0'), transparent: true,
+        depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, opacity: 0.95
+      }));
+      ring.scale.set(Rsh * 3.0, Rsh * 3.0, 1);
+      ring.renderOrder = 3;
+      group.add(ring);
+      scene.add(group);
+      const rt = registerBody(def, group, horizon, null);
+      hitSphere(rt, def.dispRad);
+    }
+
+    /* nebulae — glowing clouds of gas and newborn (or dead) stars */
+    for (const def of DATA.bodies.filter(d => d.kind === 'nebula')) {
+      const group = new THREE.Group();
+      group.position.copy(ORB.eclDir(def.neb.ra, def.neb.dec)).multiplyScalar(def.neb.dist);
+      const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: TEX.texNebula(def.neb), transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0.95
+      }));
+      const sz = def.dispRad * 2.4;
+      spr.scale.set(sz, sz, 1);
+      group.add(spr);
+      scene.add(group);
+      const rt = registerBody(def, group, null, null);
+      hitSphere(rt, def.dispRad);
+    }
+
     progress('Ready');
   }
 
@@ -1024,6 +1112,7 @@ const SCENE = (function () {
       pr.holder.scale.setScalar(1 + 0.1 * Math.sin(sunT * pr.freq * 0.8 + pr.phase));
     }
     starTwinkle.value = sunT;
+    for (const u of bhDisks) u.uTime.value = sunT;
     updateMeteors(dtReal);
 
     /* earth day/night terminator + animated clouds/auroras */
@@ -1127,7 +1216,8 @@ const SCENE = (function () {
         b.marker.scale.set(mScale, mScale, 1);
         let op = NZ.clamp((11 - meshPx) / 8, 0, 1) * 0.85;
         if (!sysVis) op = 0;
-        if (b.def.kind === 'star' || b.def.kind === 'galaxy') op = 0;
+        if (b.def.kind === 'star' || b.def.kind === 'galaxy'
+          || b.def.kind === 'blackhole' || b.def.kind === 'nebula') op = 0;
         b.marker.material.opacity = op;
         b.marker.visible = op > 0.02;
       }
@@ -1142,6 +1232,8 @@ const SCENE = (function () {
             const sy = (-_v1.y * 0.5 + 0.5) * h - Math.max(10, meshPx * 0.85) - 6;
             let pri = 30;
             if (b.def.kind === 'star') pri = b.def.id === 'sun' ? 95 : 52;
+            else if (b.def.kind === 'blackhole') pri = 58;
+            else if (b.def.kind === 'nebula') pri = 46;
             else if (b.def.kind === 'galaxy') pri = 48;
             else if (b.def.kind === 'planet') pri = 60 + b.dispRad;
             else if (b.def.kind === 'dwarf') pri = 40;

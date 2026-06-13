@@ -52,6 +52,8 @@
     if (def.kind === 'comet') return 2.6;
     if (def.kind === 'star') return def.id === 'sun' ? 30 : Math.max(body.dispRad * 4, 48);
     if (def.kind === 'galaxy') return Math.max(body.dispRad * 2.6, 600);
+    if (def.kind === 'blackhole') return Math.max(body.dispRad * 4.5, 360);
+    if (def.kind === 'nebula') return Math.max(body.dispRad * 3, 600);
     return Math.max(body.dispRad * 3.9, 0.16);
   }
 

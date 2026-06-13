@@ -1183,6 +1183,113 @@ const DATA = (function () {
       blurb: 'The hot blue star at the very end of the Big Dipper’s handle. Its arc points the way onward "to Arcturus and Spica".',
       fun: ['Its name comes from Arabic for "leader of the mourners".',
         'Unlike the bowl stars, it does not share the Dipper’s common motion.']
+    },
+
+    /* ---- black holes ---- */
+    {
+      id: 'sgra', name: 'Sagittarius A*', kind: 'blackhole', color: 0xffb060,
+      dispRad: 150, bh: { ra: 266.42, dec: -29.01, dist: 18000, tilt: 76, disk: '#ffcaa0' },
+      rows: [
+        ['Type', 'Supermassive black hole'],
+        ['Mass', '~4.3 million Suns'],
+        ['Distance', '~26,000 light-years'],
+        ['Location', 'Centre of the Milky Way (Sagittarius)'],
+        ['Imaged', '2022, Event Horizon Telescope']
+      ],
+      blurb: 'The supermassive black hole at the heart of our own galaxy. Every star in the Milky Way, including the Sun, orbits this dark giant — the Sun takes ~230 million years to go around once.',
+      fun: [
+        'In 2022 the Event Horizon Telescope captured its glowing ring of doomed light.',
+        'Stars near it whip around at thousands of km/s, and watching them won astronomers a Nobel Prize.',
+        'Its "shadow" is about the size of Mercury’s orbit, yet sits 26,000 light-years away.'
+      ]
+    },
+    {
+      id: 'm87star', name: 'M87*', kind: 'blackhole', color: 0xffb866,
+      dispRad: 250, bh: { ra: 187.7, dec: 12.34, dist: 15400, tilt: 60, disk: '#ffd0a0' },
+      rows: [
+        ['Type', 'Supermassive black hole'],
+        ['Mass', '6.5 billion Suns'],
+        ['Distance', '~53 million light-years'],
+        ['Location', 'Core of galaxy M87 (Virgo)'],
+        ['Imaged', '2019 — first black hole ever pictured']
+      ],
+      blurb: 'The first black hole humanity ever photographed. In April 2019 the Event Horizon Telescope revealed its fiery orange ring of light bending around a pit of pure darkness.',
+      fun: [
+        'It is so massive its event horizon is larger than our entire Solar System.',
+        'It fires a jet of plasma 5,000 light-years long at nearly the speed of light.',
+        'Taking its picture required linking radio telescopes across the whole Earth.'
+      ]
+    },
+    {
+      id: 'cygx1', name: 'Cygnus X-1', kind: 'blackhole', color: 0x9fc0ff,
+      dispRad: 90, bh: { ra: 299.59, dec: 35.20, dist: 9000, tilt: 68, disk: '#bcd6ff' },
+      rows: [
+        ['Type', 'Stellar-mass black hole'],
+        ['Mass', '~21 Suns'],
+        ['Distance', '7,000 light-years'],
+        ['Companion', 'Blue supergiant being devoured'],
+        ['Discovered', '1964 (X-rays); confirmed 1971']
+      ],
+      blurb: 'The first object widely accepted as a black hole. It tears gas from a giant blue companion star into a searing accretion disk that blazes in X-rays.',
+      fun: [
+        'Stephen Hawking famously bet Kip Thorne it was NOT a black hole — and conceded in 1990.',
+        'The stolen stellar gas spirals in at millions of degrees, glowing in X-rays before it vanishes.',
+        'It spins more than 800 times per second.'
+      ]
+    },
+    {
+      id: 'ton618', name: 'TON 618', kind: 'blackhole', color: 0xffd9a8,
+      dispRad: 320, bh: { ra: 184.0, dec: 28.5, dist: 26000, tilt: 52, disk: '#ffe0b0' },
+      rows: [
+        ['Type', 'Ultramassive black hole (quasar)'],
+        ['Mass', '~66 billion Suns'],
+        ['Distance', '~18.2 billion light-years'],
+        ['Power', 'Quasar — 140 trillion Suns of light']
+      ],
+      blurb: 'One of the most massive black holes known — a monster of 66 billion Suns powering a quasar so brilliant we see it across almost the entire observable universe.',
+      fun: [
+        'Its event horizon is wide enough to swallow our Solar System hundreds of times over.',
+        'We see it as it was in the young universe, over 10 billion years ago.',
+        'As a quasar it outshines its entire host galaxy by a thousandfold.'
+      ]
+    },
+
+    /* ---- nebulae ---- */
+    {
+      id: 'orionneb', name: 'Orion Nebula', kind: 'nebula', color: 0xff9ec0,
+      dispRad: 280, neb: { ra: 83.82, dec: -5.39, dist: 6000, seed: 42,
+        cols: ['255,96,150', '120,170,255', '255,180,210', '170,120,255'] },
+      rows: [
+        ['Designation', 'Messier 42'],
+        ['Type', 'Emission nebula / star nursery'],
+        ['Distance', '1,344 light-years'],
+        ['Diameter', '~24 light-years'],
+        ['Constellation', "Orion's Sword"]
+      ],
+      blurb: 'The nearest large stellar nursery — a glowing cloud where new stars and planetary systems are being born right now. It hangs just below the three belt stars of Orion.',
+      fun: [
+        'You can see it with the naked eye as the fuzzy middle "star" of Orion’s sword.',
+        'At its heart, four hot young stars called the Trapezium light the whole cloud up.',
+        'Astronomers watch infant solar systems — "proplyds" — taking shape inside it.'
+      ]
+    },
+    {
+      id: 'crabneb', name: 'Crab Nebula', kind: 'nebula', color: 0xffc080,
+      dispRad: 200, neb: { ra: 83.63, dec: 22.01, dist: 6800, seed: 1054,
+        cols: ['255,140,80', '120,200,255', '255,90,120', '180,255,200'] },
+      rows: [
+        ['Designation', 'Messier 1'],
+        ['Type', 'Supernova remnant'],
+        ['Distance', '~6,500 light-years'],
+        ['Diameter', '~11 light-years'],
+        ['Source', 'Supernova of AD 1054']
+      ],
+      blurb: 'The shredded wreckage of a star that exploded in AD 1054 — a supernova so bright it was recorded in daylight by Chinese astronomers. At its centre spins a city-sized neutron star.',
+      fun: [
+        'The Crab Pulsar at its core spins 30 times every second, sweeping beams like a lighthouse.',
+        'Its filaments are still rushing outward at about 1,500 km/s.',
+        'It was the very first object in Charles Messier’s famous catalogue (M1).'
+      ]
     }
   ];
 
