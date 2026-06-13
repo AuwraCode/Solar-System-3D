@@ -986,6 +986,30 @@ const TEX = (function () {
     return toTexture(cv);
   }
 
+  function spriteStar() {
+    const s = 128, c = s / 2;
+    const { cv, ctx } = makeCanvas(s, s);
+    let g = ctx.createRadialGradient(c, c, 0, c, c, c);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.12, 'rgba(255,255,255,0.7)');
+    g.addColorStop(0.34, 'rgba(255,255,255,0.14)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, s, s);
+    /* four diffraction spikes */
+    ctx.globalCompositeOperation = 'lighter';
+    for (const rot of [0, Math.PI / 2]) {
+      ctx.save();
+      ctx.translate(c, c); ctx.rotate(rot); ctx.scale(1, 0.03);
+      const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, c * 0.95);
+      sg.addColorStop(0, 'rgba(255,255,255,0.85)');
+      sg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = sg;
+      ctx.beginPath(); ctx.arc(0, 0, c * 0.95, 0, 7); ctx.fill();
+      ctx.restore();
+    }
+    return toTexture(cv);
+  }
+
   function spriteDot() {
     const s = 64;
     const { cv, ctx } = makeCanvas(s, s);
@@ -1030,6 +1054,6 @@ const TEX = (function () {
 
   return {
     setAniso, registry, texEarth, texSaturnRings, texUranusRings, texMilkyWay,
-    texGalaxy, spriteGlow, spriteSun, spriteDot, toTexture, makeCanvas
+    texGalaxy, spriteGlow, spriteSun, spriteStar, spriteDot, toTexture, makeCanvas
   };
 })();

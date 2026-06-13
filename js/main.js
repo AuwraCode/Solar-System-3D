@@ -50,7 +50,7 @@
     if (def.kind === 'region') return def.view.dist;
     if (def.kind === 'craft') return 0.55;
     if (def.kind === 'comet') return 2.6;
-    if (def.kind === 'star') return 30;
+    if (def.kind === 'star') return def.id === 'sun' ? 30 : Math.max(body.dispRad * 4, 48);
     if (def.kind === 'galaxy') return Math.max(body.dispRad * 2.6, 600);
     return Math.max(body.dispRad * 3.9, 0.16);
   }

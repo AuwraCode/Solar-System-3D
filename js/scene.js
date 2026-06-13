@@ -878,6 +878,52 @@ const SCENE = (function () {
       hitSphere(rt, def.dispRad * 0.85);
     }
 
+    /* famous stars — bright named suns on a distant celestial shell, placed
+       by real RA/Dec so the constellations keep their true shapes */
+    progress('Lighting the famous stars…');
+    await tick();
+    const STAR_SHELL = 6500;
+    const starTex = TEX.spriteStar();
+    for (const def of DATA.bodies.filter(d => d.kind === 'star' && d.id !== 'sun')) {
+      const s = def.star;
+      def.dispRad = NZ.clamp(26 - s.mag * 6, 7, 34);
+      const group = new THREE.Group();
+      group.position.copy(ORB.eclDir(s.ra, s.dec)).multiplyScalar(STAR_SHELL);
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: starTex, color: new THREE.Color(s.spect || '#ffffff'), transparent: true,
+        opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending
+      }));
+      const gs = def.dispRad * 2.4;
+      glow.scale.set(gs, gs, 1);
+      glow.renderOrder = 2;
+      group.add(glow);
+      scene.add(group);
+      const rt = registerBody(def, group, null, null);
+      rt.starGlow = glow;
+      hitSphere(rt, def.dispRad * 1.5);
+    }
+
+    /* constellation lines tracing Orion and the Big Dipper */
+    for (const con of (DATA.constellations || [])) {
+      const verts = [];
+      for (const [a, b] of con.pairs) {
+        const A = byId[a], B = byId[b];
+        if (!A || !B) continue;
+        verts.push(A.group.position.x, A.group.position.y, A.group.position.z,
+          B.group.position.x, B.group.position.y, B.group.position.z);
+      }
+      if (!verts.length) continue;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+      const line = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+        color: 0x8fb0e0, transparent: true, opacity: 0.16, depthWrite: false,
+        blending: THREE.AdditiveBlending
+      }));
+      line.renderOrder = -7;
+      line.frustumCulled = false;
+      scene.add(line);
+    }
+
     progress('Ready');
   }
 
@@ -1095,7 +1141,7 @@ const SCENE = (function () {
             const sx = (_v1.x * 0.5 + 0.5) * w;
             const sy = (-_v1.y * 0.5 + 0.5) * h - Math.max(10, meshPx * 0.85) - 6;
             let pri = 30;
-            if (b.def.kind === 'star') pri = 95;
+            if (b.def.kind === 'star') pri = b.def.id === 'sun' ? 95 : 52;
             else if (b.def.kind === 'galaxy') pri = 48;
             else if (b.def.kind === 'planet') pri = 60 + b.dispRad;
             else if (b.def.kind === 'dwarf') pri = 40;

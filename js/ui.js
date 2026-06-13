@@ -61,13 +61,14 @@ const UI = (function () {
 
   function buildNav() {
     const groups = [
-      ['Star', d => d.kind === 'star'],
+      ['The Sun', d => d.id === 'sun'],
       ['Planets', d => d.kind === 'planet'],
       ['Dwarf planets', d => d.kind === 'dwarf'],
       ['Moons', d => d.kind === 'moon'],
       ['Spacecraft', d => d.kind === 'craft'],
       ['Comets', d => d.kind === 'comet'],
       ['Regions', d => d.kind === 'region'],
+      ['Stars', d => d.kind === 'star' && d.id !== 'sun'],
       ['Galaxies', d => d.kind === 'galaxy']
     ];
     const box = $('navList');

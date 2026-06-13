@@ -893,7 +893,308 @@ const DATA = (function () {
         'It contains an estimated 12,000 globular clusters, dwarfing the Milky Way’s ~150.',
         'Its blue jet, blasted from the black hole, is visible even in modest telescopes.'
       ]
+    },
+
+    /* ---- famous stars: placed by real RA/Dec so constellations form ---- */
+    {
+      id: 'sirius', name: 'Sirius', kind: 'star', color: 0xcfe0ff,
+      star: { ra: 101.29, dec: -16.72, mag: -1.46, spect: '#cfe0ff' },
+      rows: [['Constellation', 'Canis Major'], ['Distance', '8.6 light-years'],
+        ['Type', 'A1V white main-sequence + white dwarf'], ['Apparent magnitude', '−1.46 (brightest star)']],
+      blurb: 'The brightest star in the night sky — a hot white sun only 8.6 light-years away, with a dense white-dwarf companion, "the Pup", circling it.',
+      fun: ['Ancient Egyptians timed the Nile floods by its dawn rising.',
+        'Its twinkling, low on the horizon, flashes through every colour and is often mistaken for a UFO.',
+        'The companion Sirius B packs the Sun’s mass into an Earth-sized ball.']
+    },
+    {
+      id: 'canopus', name: 'Canopus', kind: 'star', color: 0xfff4e0,
+      star: { ra: 95.99, dec: -52.70, mag: -0.74, spect: '#fff4e0' },
+      rows: [['Constellation', 'Carina'], ['Distance', '~310 light-years'],
+        ['Type', 'A9 / F0 bright giant'], ['Apparent magnitude', '−0.74 (2nd brightest)']],
+      blurb: 'The second-brightest star in the sky, a luminous southern giant 10,000 times brighter than the Sun. Spacecraft use it as a navigation reference.',
+      fun: ['Many interplanetary probes carry a "Canopus star tracker" to orient themselves.',
+        'It never rises for most of Europe and the northern United States.',
+        'It shines with the light of about 10,000 Suns.']
+    },
+    {
+      id: 'alphacen', name: 'Alpha Centauri', kind: 'star', color: 0xfff0c8,
+      star: { ra: 219.90, dec: -60.83, mag: -0.27, spect: '#fff0c8' },
+      rows: [['Constellation', 'Centaurus'], ['Distance', '4.37 light-years'],
+        ['Type', 'G2V + K1V (+ red dwarf Proxima)'], ['Apparent magnitude', '−0.27 (combined)']],
+      blurb: 'The closest star system to the Sun — a Sun-like pair with the red dwarf Proxima Centauri, which hosts the nearest known exoplanet, Proxima b.',
+      fun: ['At 4.37 light-years it is our nearest stellar neighbour.',
+        'The Breakthrough Starshot project dreams of sending tiny probes here within a human lifetime.',
+        'Alpha Centauri A is almost a twin of our own Sun.']
+    },
+    {
+      id: 'arcturus', name: 'Arcturus', kind: 'star', color: 0xffc890,
+      star: { ra: 213.92, dec: 19.18, mag: -0.05, spect: '#ffc890' },
+      rows: [['Constellation', 'Boötes'], ['Distance', '36.7 light-years'],
+        ['Type', 'K0 III orange giant'], ['Apparent magnitude', '−0.05']],
+      blurb: 'A glowing orange giant, the brightest star in the northern sky. It is racing through the galaxy at right angles to the disk, part of an ancient stellar stream.',
+      fun: ['Its light was used to open the 1933 Chicago World’s Fair.',
+        'Follow the curve of the Big Dipper’s handle to "arc to Arcturus".',
+        'It is about 25 times the Sun’s diameter.']
+    },
+    {
+      id: 'vega', name: 'Vega', kind: 'star', color: 0xdfe8ff,
+      star: { ra: 279.23, dec: 38.78, mag: 0.03, spect: '#dfe8ff' },
+      rows: [['Constellation', 'Lyra'], ['Distance', '25 light-years'],
+        ['Type', 'A0V white main-sequence'], ['Apparent magnitude', '0.03']],
+      blurb: 'A brilliant blue-white star that was once the North Star and will be again. Vega is the zero-point against which star brightnesses were historically calibrated.',
+      fun: ['Earth’s wobble will make Vega the pole star again around the year 13,727.',
+        'It is encircled by a disk of dust — possibly a forming planetary system.',
+        'It was the first star ever photographed (1850) and the setting of the novel/film "Contact".']
+    },
+    {
+      id: 'capella', name: 'Capella', kind: 'star', color: 0xfff0c8,
+      star: { ra: 79.17, dec: 45.99, mag: 0.08, spect: '#fff0c8' },
+      rows: [['Constellation', 'Auriga'], ['Distance', '43 light-years'],
+        ['Type', 'Two yellow giants (G-type)'], ['Apparent magnitude', '0.08']],
+      blurb: 'The "little she-goat" — actually two yellow giant stars orbiting each other closely, the most northerly first-magnitude star.',
+      fun: ['What looks like one star is really four, in two pairs.',
+        'It is the sixth-brightest star in the night sky.',
+        'For far-northern observers it never sets.']
+    },
+    {
+      id: 'rigel', name: 'Rigel', kind: 'star', color: 0xbcd0ff,
+      star: { ra: 78.63, dec: -8.20, mag: 0.18, spect: '#bcd0ff' },
+      rows: [['Constellation', 'Orion (left foot)'], ['Distance', '~860 light-years'],
+        ['Type', 'B8 blue supergiant'], ['Apparent magnitude', '0.18']],
+      blurb: 'A dazzling blue supergiant marking Orion’s foot, around 120,000 times more luminous than the Sun and one of the most powerful stars visible to the eye.',
+      fun: ['Despite being far dimmer-looking than nearby Betelgeuse in luminosity terms, it usually outshines it.',
+        'It is a young star destined to end in a supernova.',
+        'It has faint companion stars huddled beside it.']
+    },
+    {
+      id: 'procyon', name: 'Procyon', kind: 'star', color: 0xfff2e0,
+      star: { ra: 114.83, dec: 5.22, mag: 0.34, spect: '#fff2e0' },
+      rows: [['Constellation', 'Canis Minor'], ['Distance', '11.5 light-years'],
+        ['Type', 'F5 subgiant + white dwarf'], ['Apparent magnitude', '0.34']],
+      blurb: 'A nearby yellow-white star, the eighth-brightest in the sky. With Sirius and Betelgeuse it forms the bright "Winter Triangle".',
+      fun: ['Its name means "before the dog", as it rises just ahead of Sirius the Dog Star.',
+        'Like Sirius, it has a white-dwarf companion.',
+        'It is only 11.5 light-years away.']
+    },
+    {
+      id: 'betelgeuse', name: 'Betelgeuse', kind: 'star', color: 0xff7d5a,
+      star: { ra: 88.79, dec: 7.41, mag: 0.45, spect: '#ff7d5a' },
+      rows: [['Constellation', 'Orion (shoulder)'], ['Distance', '~550 light-years'],
+        ['Type', 'M1 red supergiant'], ['Apparent magnitude', '0.0–1.6 (variable)']],
+      blurb: 'A vast, dying red supergiant so huge it would swallow Jupiter’s orbit if placed at the Sun. It will explode as a supernova — astronomically soon.',
+      fun: ['In 2019–2020 it mysteriously dimmed; a dust cloud it had belched out was the culprit.',
+        'When it goes supernova it will briefly rival the Moon and be visible in daylight.',
+        'It is so big that its surface boils in titanic, slowly churning cells.']
+    },
+    {
+      id: 'aldebaran', name: 'Aldebaran', kind: 'star', color: 0xffb878,
+      star: { ra: 68.98, dec: 16.51, mag: 0.86, spect: '#ffb878' },
+      rows: [['Constellation', 'Taurus (the eye)'], ['Distance', '65 light-years'],
+        ['Type', 'K5 orange giant'], ['Apparent magnitude', '0.86']],
+      blurb: 'The fiery orange eye of Taurus the Bull, glaring out near the Hyades and Pleiades star clusters (though it sits well in front of them).',
+      fun: ['Pioneer 10 is drifting toward it and will pass near it in about 2 million years.',
+        'It is around 44 times the Sun’s diameter.',
+        'Its name is Arabic for "the follower", trailing the Pleiades across the sky.']
+    },
+    {
+      id: 'antares', name: 'Antares', kind: 'star', color: 0xff8a5e,
+      star: { ra: 247.35, dec: -26.43, mag: 1.06, spect: '#ff8a5e' },
+      rows: [['Constellation', 'Scorpius (the heart)'], ['Distance', '~550 light-years'],
+        ['Type', 'M1 red supergiant'], ['Apparent magnitude', '0.6–1.6 (variable)']],
+      blurb: 'The blood-red heart of the Scorpion, a red supergiant rivalling Betelgeuse in size. Its name means "rival of Mars" for its similar ruddy glow.',
+      fun: ['If placed at the Sun, its surface would reach beyond the orbit of Mars.',
+        'It too is a future supernova.',
+        'The Moon regularly passes in front of it, a rare bright-star occultation.']
+    },
+    {
+      id: 'spica', name: 'Spica', kind: 'star', color: 0xc8d8ff,
+      star: { ra: 201.30, dec: -11.16, mag: 0.98, spect: '#c8d8ff' },
+      rows: [['Constellation', 'Virgo'], ['Distance', '250 light-years'],
+        ['Type', 'B1 blue giant pair'], ['Apparent magnitude', '0.98']],
+      blurb: 'A hot blue pair of stars whirling around each other every four days, so close they are egg-shaped. "Spica" means the ear of wheat held by Virgo.',
+      fun: ['"Drive a spike to Spica" by continuing the arc past Arcturus.',
+        'The two stars distort each other into elongated shapes.',
+        'It is one of the nearest stars massive enough to one day explode.']
+    },
+    {
+      id: 'pollux', name: 'Pollux', kind: 'star', color: 0xffcf98,
+      star: { ra: 116.33, dec: 28.03, mag: 1.14, spect: '#ffcf98' },
+      rows: [['Constellation', 'Gemini (a twin)'], ['Distance', '34 light-years'],
+        ['Type', 'K0 orange giant'], ['Apparent magnitude', '1.14']],
+      blurb: 'The brighter of the Gemini twins, an orange giant with a confirmed planet — one of the nearest giant stars known to host a world.',
+      fun: ['Its planet, Pollux b, is about twice Jupiter’s mass.',
+        'It outshines its "twin" Castor despite Castor’s "alpha" designation.',
+        'It lies just 34 light-years away.']
+    },
+    {
+      id: 'deneb', name: 'Deneb', kind: 'star', color: 0xeef2ff,
+      star: { ra: 310.36, dec: 45.28, mag: 1.25, spect: '#eef2ff' },
+      rows: [['Constellation', 'Cygnus (the tail)'], ['Distance', '~1,500 light-years'],
+        ['Type', 'A2 blue-white supergiant'], ['Apparent magnitude', '1.25']],
+      blurb: 'One of the most luminous stars known — a blue-white supergiant blazing with perhaps 200,000 Suns, yet looking modest only because it is so far away.',
+      fun: ['It anchors one corner of the Summer Triangle with Vega and Altair.',
+        'If it were as close as Sirius it would cast shadows at night.',
+        'It marks the tail of Cygnus the Swan, flying down the Milky Way.']
+    },
+    {
+      id: 'regulus', name: 'Regulus', kind: 'star', color: 0xd2e2ff,
+      star: { ra: 152.09, dec: 11.97, mag: 1.40, spect: '#d2e2ff' },
+      rows: [['Constellation', 'Leo (the heart)'], ['Distance', '79 light-years'],
+        ['Type', 'B8 blue-white main-sequence'], ['Apparent magnitude', '1.40']],
+      blurb: 'The "little king" at the heart of Leo. It spins so fast — once every 16 hours — that it is squashed into a flattened, egg-like shape.',
+      fun: ['If it spun just 10% faster, it would fly apart.',
+        'It sits almost exactly on the ecliptic, so the Moon and planets often pass it.',
+        'It is really a four-star system.']
+    },
+    {
+      id: 'altair', name: 'Altair', kind: 'star', color: 0xe8efff,
+      star: { ra: 297.70, dec: 8.87, mag: 0.76, spect: '#e8efff' },
+      rows: [['Constellation', 'Aquila'], ['Distance', '16.7 light-years'],
+        ['Type', 'A7 white main-sequence'], ['Apparent magnitude', '0.76']],
+      blurb: 'A nearby fast-spinning white star, the third corner of the Summer Triangle. It rotates so quickly its equator bulges noticeably.',
+      fun: ['It completes a rotation in about 9 hours, versus the Sun’s 25 days.',
+        'It is one of the few stars whose actual surface has been imaged.',
+        'At 16.7 light-years it is a close neighbour.']
+    },
+    {
+      id: 'fomalhaut', name: 'Fomalhaut', kind: 'star', color: 0xe6eeff,
+      star: { ra: 344.41, dec: -29.62, mag: 1.16, spect: '#e6eeff' },
+      rows: [['Constellation', 'Piscis Austrinus'], ['Distance', '25 light-years'],
+        ['Type', 'A3 white main-sequence'], ['Apparent magnitude', '1.16']],
+      blurb: 'The "lonely star of autumn", a young white sun girdled by a sharp ring of dusty debris — one of the first such disks ever directly photographed.',
+      fun: ['Its dust ring is so crisp it is nicknamed "the Eye of Sauron".',
+        'A controversial object once thought to be a planet there turned out to be an expanding dust cloud.',
+        'It shines alone in an otherwise dim patch of sky.']
+    },
+    {
+      id: 'polaris', name: 'Polaris', kind: 'star', color: 0xfff6ea,
+      star: { ra: 37.95, dec: 89.26, mag: 1.98, spect: '#fff6ea' },
+      rows: [['Constellation', 'Ursa Minor'], ['Distance', '~430 light-years'],
+        ['Type', 'F7 supergiant (Cepheid)'], ['Apparent magnitude', '1.98']],
+      blurb: 'The North Star — sitting almost exactly above Earth’s north pole, so it barely moves while the whole sky wheels around it. Navigators have steered by it for centuries.',
+      fun: ['It is a Cepheid variable, gently pulsing in brightness.',
+        'It will not always be the pole star — in 12,000 years that honour passes to Vega.',
+        'The two front stars of the Big Dipper’s bowl point straight to it.']
+    },
+    {
+      id: 'bellatrix', name: 'Bellatrix', kind: 'star', color: 0xc4d6ff,
+      star: { ra: 81.28, dec: 6.35, mag: 1.64, spect: '#c4d6ff' },
+      rows: [['Constellation', 'Orion (shoulder)'], ['Distance', '250 light-years'],
+        ['Type', 'B2 blue giant'], ['Apparent magnitude', '1.64']],
+      blurb: 'The "female warrior" marking Orion’s left shoulder — a hot blue giant and one of the hottest stars easily visible to the naked eye.',
+      fun: ['It is sometimes called the "Amazon Star".',
+        'It glows with a distinctly blue-white hue beside ruddy Betelgeuse.']
+    },
+    {
+      id: 'saiph', name: 'Saiph', kind: 'star', color: 0xcbe0ff,
+      star: { ra: 86.94, dec: -9.67, mag: 2.07, spect: '#cbe0ff' },
+      rows: [['Constellation', 'Orion (knee)'], ['Distance', '~650 light-years'],
+        ['Type', 'B0 blue supergiant'], ['Apparent magnitude', '2.07']],
+      blurb: 'A blue supergiant marking Orion’s right knee. Though as luminous as Rigel, much of its output is invisible ultraviolet, so it looks fainter.',
+      fun: ['Its name means "sword of the giant" in Arabic.',
+        'Like the other Orion supergiants, it will end as a supernova.']
+    },
+    {
+      id: 'alnitak', name: 'Alnitak', kind: 'star', color: 0xb8ccff,
+      star: { ra: 85.19, dec: -1.94, mag: 1.77, spect: '#b8ccff' },
+      rows: [['Constellation', 'Orion (belt, east)'], ['Distance', '~1,260 light-years'],
+        ['Type', 'O9 blue supergiant'], ['Apparent magnitude', '1.77']],
+      blurb: 'The eastern star of Orion’s Belt, a brilliant triple system whose searing light illuminates the nearby Flame and Horsehead Nebulae.',
+      fun: ['It is one of the closest O-type (hottest class) stars to Earth.',
+        'The famous Horsehead Nebula is silhouetted just beside it.']
+    },
+    {
+      id: 'alnilam', name: 'Alnilam', kind: 'star', color: 0xc0d4ff,
+      star: { ra: 84.05, dec: -1.20, mag: 1.69, spect: '#c0d4ff' },
+      rows: [['Constellation', 'Orion (belt, centre)'], ['Distance', '~2,000 light-years'],
+        ['Type', 'B0 blue supergiant'], ['Apparent magnitude', '1.69']],
+      blurb: 'The central jewel of Orion’s Belt — a colossal blue supergiant shining with around 400,000 Suns from nearly 2,000 light-years away.',
+      fun: ['It is losing mass in a strong stellar wind, wrapped in its own glowing nebula.',
+        'It is among the most luminous stars you can see without a telescope.']
+    },
+    {
+      id: 'mintaka', name: 'Mintaka', kind: 'star', color: 0xbcd0ff,
+      star: { ra: 83.00, dec: -0.30, mag: 2.23, spect: '#bcd0ff' },
+      rows: [['Constellation', 'Orion (belt, west)'], ['Distance', '~1,200 light-years'],
+        ['Type', 'O/B multiple system'], ['Apparent magnitude', '2.23']],
+      blurb: 'The western star of Orion’s Belt, sitting almost exactly on the celestial equator — so it rises due east and sets due west for the whole world.',
+      fun: ['It is a complex system of at least five stars.',
+        'Because it straddles the equator, everyone on Earth can see it.']
+    },
+    {
+      id: 'dubhe', name: 'Dubhe', kind: 'star', color: 0xffd0a0,
+      star: { ra: 165.93, dec: 61.75, mag: 1.79, spect: '#ffd0a0' },
+      rows: [['Constellation', 'Ursa Major (pointer)'], ['Distance', '123 light-years'],
+        ['Type', 'K0 orange giant'], ['Apparent magnitude', '1.79']],
+      blurb: 'The upper "pointer" star of the Big Dipper’s bowl. A line from Dubhe through Merak points straight at Polaris, the North Star.',
+      fun: ['It and Merak are the famous "Pointers" to the pole.',
+        'Unlike most of the Dipper, it is not part of the same moving star group — it just happens to lie along the pattern.']
+    },
+    {
+      id: 'merak', name: 'Merak', kind: 'star', color: 0xe6eeff,
+      star: { ra: 165.46, dec: 56.38, mag: 2.37, spect: '#e6eeff' },
+      rows: [['Constellation', 'Ursa Major (pointer)'], ['Distance', '79 light-years'],
+        ['Type', 'A1 white main-sequence'], ['Apparent magnitude', '2.37']],
+      blurb: 'The lower "pointer" of the Big Dipper’s bowl, partnering Dubhe to aim sky-watchers toward Polaris.',
+      fun: ['Merak and Dubhe are the "Pointer Stars".',
+        'It is surrounded by a disk of dust, like Vega and Fomalhaut.']
+    },
+    {
+      id: 'phecda', name: 'Phecda', kind: 'star', color: 0xe6eeff,
+      star: { ra: 178.46, dec: 53.69, mag: 2.44, spect: '#e6eeff' },
+      rows: [['Constellation', 'Ursa Major (bowl)'], ['Distance', '84 light-years'],
+        ['Type', 'A0 white main-sequence'], ['Apparent magnitude', '2.44']],
+      blurb: 'A white star at the bottom of the Big Dipper’s bowl, part of the cluster of stars that share a common drift through the galaxy.',
+      fun: ['Most of the Dipper’s stars belong to the same moving group, born together.',
+        'It lies where the bowl meets the handle.']
+    },
+    {
+      id: 'megrez', name: 'Megrez', kind: 'star', color: 0xe6eeff,
+      star: { ra: 183.86, dec: 57.03, mag: 3.31, spect: '#e6eeff' },
+      rows: [['Constellation', 'Ursa Major (bowl/handle)'], ['Distance', '58 light-years'],
+        ['Type', 'A3 white main-sequence'], ['Apparent magnitude', '3.31']],
+      blurb: 'The faintest of the seven Big Dipper stars, where the bowl joins the handle. Its dimness is a handy test of how dark your sky is.',
+      fun: ['If you can’t spot Megrez, light pollution is washing out your sky.',
+        'Its name means "root of the tail" of the Great Bear.']
+    },
+    {
+      id: 'alioth', name: 'Alioth', kind: 'star', color: 0xeef2ff,
+      star: { ra: 193.51, dec: 55.96, mag: 1.77, spect: '#eef2ff' },
+      rows: [['Constellation', 'Ursa Major (handle)'], ['Distance', '82 light-years'],
+        ['Type', 'A0 peculiar main-sequence'], ['Apparent magnitude', '1.77']],
+      blurb: 'The brightest star of the Big Dipper, first in the handle. Its spectrum shows odd, shifting chemical patches dragged around by a strong magnetic field.',
+      fun: ['It is the brightest of the seven Dipper stars.',
+        'Its surface chemistry seems to change as it rotates.']
+    },
+    {
+      id: 'mizar', name: 'Mizar', kind: 'star', color: 0xe8eeff,
+      star: { ra: 200.98, dec: 54.93, mag: 2.04, spect: '#e8eeff' },
+      rows: [['Constellation', 'Ursa Major (handle)'], ['Distance', '83 light-years'],
+        ['Type', 'A2 quadruple system'], ['Apparent magnitude', '2.04']],
+      blurb: 'The handle star famous for its naked-eye companion Alcor — a classic eyesight test. Mizar itself is the first star found to be a telescopic double, and is really four stars.',
+      fun: ['Spotting faint Alcor beside Mizar was an ancient vision test.',
+        'Mizar was the first double star ever photographed (1857).']
+    },
+    {
+      id: 'alkaid', name: 'Alkaid', kind: 'star', color: 0xcfe0ff,
+      star: { ra: 206.89, dec: 49.31, mag: 1.86, spect: '#cfe0ff' },
+      rows: [['Constellation', 'Ursa Major (handle tip)'], ['Distance', '104 light-years'],
+        ['Type', 'B3 blue main-sequence'], ['Apparent magnitude', '1.86']],
+      blurb: 'The hot blue star at the very end of the Big Dipper’s handle. Its arc points the way onward "to Arcturus and Spica".',
+      fun: ['Its name comes from Arabic for "leader of the mourners".',
+        'Unlike the bowl stars, it does not share the Dipper’s common motion.']
     }
+  ];
+
+  const constellations = [
+    { name: 'Orion', pairs: [
+      ['betelgeuse', 'bellatrix'], ['betelgeuse', 'alnitak'], ['bellatrix', 'mintaka'],
+      ['alnitak', 'alnilam'], ['alnilam', 'mintaka'], ['alnitak', 'saiph'], ['mintaka', 'rigel']
+    ] },
+    { name: 'Big Dipper', pairs: [
+      ['alkaid', 'mizar'], ['mizar', 'alioth'], ['alioth', 'megrez'], ['megrez', 'phecda'],
+      ['phecda', 'merak'], ['merak', 'dubhe'], ['dubhe', 'megrez']
+    ] }
   ];
 
   const byId = {};
@@ -902,5 +1203,5 @@ const DATA = (function () {
     byId[b.id] = b;
   }
 
-  return { AU, bodies, byId, dispR };
+  return { AU, bodies, byId, dispR, constellations };
 })();
