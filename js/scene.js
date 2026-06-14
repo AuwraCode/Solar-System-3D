@@ -6,6 +6,7 @@ const SCENE = (function () {
   let root, rendererRef, labelBox, camRef;
   let sunUniforms, earthUniforms, sunCorona, sunCore;
   let beltMesh, beltData, kuiperPts;
+  let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
   let sunProms = [], meteors = [], bhDisks = [];
   const starTwinkle = { value: 0 };
   const comets = [];
@@ -1189,21 +1190,25 @@ const SCENE = (function () {
       trailUpdate(c.dust, dtReal);
     }
 
-    /* asteroid belt */
-    for (let i = 0; i < beltData.length; i++) {
-      const a = beltData[i];
-      const ang = a.phase + a.n * simDays;
-      const x0 = Math.cos(ang) * a.R, z0 = -Math.sin(ang) * a.R;
-      const y = Math.sin(ang + a.node) * a.incl * a.R * 0.5;
-      _m.position.set(x0, y, z0);
-      _m.rotation.set(a.tx + simDays * a.tr * 0.2, a.ty + simDays * a.tr * 0.13, 0);
-      _m.scale.setScalar(a.s);
-      _m.updateMatrix();
-      beltMesh.setMatrixAt(i, _m.matrix);
+    /* asteroid belt + Kuiper Belt — rebuilding 2300 instance matrices is the
+       heaviest CPU step, so only do it when sim time actually advanced (skips it
+       entirely whenever time is paused) */
+    if (simDays !== lastBeltDays) {
+      lastBeltDays = simDays;
+      for (let i = 0; i < beltData.length; i++) {
+        const a = beltData[i];
+        const ang = a.phase + a.n * simDays;
+        const x0 = Math.cos(ang) * a.R, z0 = -Math.sin(ang) * a.R;
+        const y = Math.sin(ang + a.node) * a.incl * a.R * 0.5;
+        _m.position.set(x0, y, z0);
+        _m.rotation.set(a.tx + simDays * a.tr * 0.2, a.ty + simDays * a.tr * 0.13, 0);
+        _m.scale.setScalar(a.s);
+        _m.updateMatrix();
+        beltMesh.setMatrixAt(i, _m.matrix);
+      }
+      beltMesh.instanceMatrix.needsUpdate = true;
+      kuiperPts.rotation.y = simDays * 2 * Math.PI / (365.25 * 270);
     }
-    beltMesh.instanceMatrix.needsUpdate = true;
-
-    kuiperPts.rotation.y = simDays * 2 * Math.PI / (365.25 * 270);
 
     /* cache world positions — non-forced so the frozen static subtrees (galaxies,
        stars, nebulae, orbit lines, sky) are skipped; movers still propagate via
