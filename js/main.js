@@ -175,6 +175,12 @@
         const on = document.body.classList.toggle('cinema');
         if (on) UI.toast('🎬 Cinema mode — press C to bring the controls back.');
       }
+      else if (k === '[' || k === ']') {
+        let idx = STATE.selected ? planetKeys.indexOf(STATE.selected.id) : -1;
+        if (idx < 0) idx = k === ']' ? -1 : 0;
+        idx = (idx + (k === ']' ? 1 : -1) + planetKeys.length) % planetKeys.length;
+        select(planetKeys[idx]);
+      }
       else if (k === 'h' || k === '?') document.getElementById('help').classList.toggle('open');
       else if (k === 't') document.getElementById('btnTour').click();
     });
