@@ -10,6 +10,8 @@ const SCENE = (function () {
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
   let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [], auroraRings = [], pulsars = [];
   let trojans = [], constellationLines = [];
+  let artemisRt = null, artemisState = 'idle', artemisT = 0, artemisPhase = -1, artemisMsg = null;
+  const ARTEMIS_DUR = 30;   // seconds Earth -> Moon
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -429,6 +431,30 @@ const SCENE = (function () {
     sec.position.set(0, 0.3 * s, -0.75 * s);
     sec.rotation.x = 0.9;
     g.add(sec);
+    return g;
+  }
+
+  function modelOrion() {
+    /* Orion: conical crew capsule + service module + four solar arrays.
+       Built nose toward +z so lookAt(travel direction) points it forward. */
+    const g = new THREE.Group(), s = 0.05;
+    const capsule = new THREE.Mesh(new THREE.CylinderGeometry(0.18 * s, 0.55 * s, 0.7 * s, 16), MAT.white);
+    capsule.rotation.x = Math.PI / 2;        /* taper points +z */
+    capsule.position.z = 0.45 * s;
+    g.add(capsule);
+    const service = new THREE.Mesh(new THREE.CylinderGeometry(0.55 * s, 0.55 * s, 0.7 * s, 16), MAT.gray);
+    service.rotation.x = Math.PI / 2;
+    service.position.z = -0.25 * s;
+    g.add(service);
+    for (let i = 0; i < 4; i++) {
+      const arm = new THREE.Group();
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(1.5 * s, 0.02 * s, 0.5 * s), MAT.panel);
+      panel.position.x = 1.05 * s;
+      arm.add(panel);
+      arm.position.z = -0.25 * s;
+      arm.rotation.z = i * Math.PI / 2;
+      g.add(arm);
+    }
     return g;
   }
 
@@ -1298,6 +1324,19 @@ const SCENE = (function () {
       staticLocal.push(group);   /* fixed in the sky; the spin group animates */
     }
 
+    /* Artemis / Orion — parked and hidden until a mission is launched */
+    if (DATA.byId.artemis) {
+      const og = new THREE.Group();
+      const orion = modelOrion();
+      og.add(orion);
+      og.visible = false;
+      scene.add(og);
+      artemisRt = registerBody(DATA.byId.artemis, og, null, null);
+      artemisRt.model = orion;
+      artemisRt.layerHidden = true;   /* no label/marker until launch */
+      hitSphere(artemisRt, 0.12);
+    }
+
     /* freeze the static set: bake their world matrices once and stop them from
        being touched by every frame's scene-graph traversal */
     for (const o of staticObjs) {
@@ -1409,6 +1448,63 @@ const SCENE = (function () {
     } else {
       measLabel.style.display = 'none';
     }
+  }
+
+  /* ---------- Artemis mission ---------- */
+
+  function launchArtemis() {
+    if (!artemisRt) return false;
+    artemisState = 'flying';
+    artemisT = 0;
+    artemisPhase = -1;
+    artemisRt.group.visible = true;
+    artemisRt.layerHidden = false;
+    return true;
+  }
+
+  function artemisMessage() { const m = artemisMsg; artemisMsg = null; return m; }
+
+  const ARTEMIS_PHASES = [
+    [0.00, '🚀 Liftoff! Artemis Orion leaves Earth.'],
+    [0.16, 'Trans-lunar injection — boosting onto a path to the Moon.'],
+    [0.55, 'Coasting across ~380,000 km of empty space…'],
+    [0.92, '🌙 Arriving at the Moon — lunar orbit insertion.']
+  ];
+
+  function updateArtemis(dt) {
+    if (!artemisRt) return;
+    const earth = byId.earth, moon = byId.luna;
+    if (!earth || !moon) return;
+    if (artemisState === 'idle') {
+      artemisRt.group.position.copy(earth.wp);
+      artemisRt.wp.copy(earth.wp);
+      return;
+    }
+    if (artemisState === 'arrived') {
+      const out = _v3.copy(moon.wp).sub(earth.wp).normalize();
+      artemisRt.group.position.copy(moon.wp).addScaledVector(out, moon.dispRad * 2.4);
+      artemisRt.wp.copy(artemisRt.group.position);
+      artemisRt.model.lookAt(moon.wp);
+      return;
+    }
+    /* flying */
+    artemisT += dt;
+    let u = artemisT / ARTEMIS_DUR;
+    if (u >= 1) { u = 1; artemisState = 'arrived'; }
+    const e = u * u * (3 - 2 * u);
+    const a = _v1.copy(earth.wp), b = _v2.copy(moon.wp);
+    const dir = _v3.copy(b).sub(a);
+    const dist = dir.length();
+    const pos = artemisRt.group.position.copy(a).addScaledVector(dir, e);
+    const perp = _vm2.copy(dir).cross(_vm1.set(0, 1, 0));
+    if (perp.lengthSq() < 1e-6) perp.set(1, 0, 0);
+    perp.normalize();
+    pos.addScaledVector(perp, Math.sin(e * Math.PI) * dist * 0.14);
+    artemisRt.wp.copy(pos);
+    artemisRt.model.lookAt(b);
+    let pi = 0;
+    for (let i = 0; i < ARTEMIS_PHASES.length; i++) if (u >= ARTEMIS_PHASES[i][0]) pi = i;
+    if (pi !== artemisPhase) { artemisPhase = pi; artemisMsg = ARTEMIS_PHASES[pi][1]; }
   }
 
   /* ---------- per-frame ---------- */
@@ -1592,6 +1688,8 @@ const SCENE = (function () {
       f.sys.pts.visible = close;
       if (close) fountainStep(f.sys, dtReal);
     }
+
+    updateArtemis(dtReal);
   }
 
   /* ---------- view-dependent: markers, labels, fades ---------- */
@@ -1787,7 +1885,7 @@ const SCENE = (function () {
 
   return {
     build, update, updateView, screenPick, raycastPick, setVisible,
-    setMeasure, measureInfo,
+    setMeasure, measureInfo, launchArtemis, artemisMessage,
     bodies, byId,
     onSelect: null
   };

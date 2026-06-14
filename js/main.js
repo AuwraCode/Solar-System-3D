@@ -76,7 +76,7 @@
     STATE.selected = body;
     UI.showInfo(body.def);
     rig.setTarget(body, {
-      dist: viewDist(body),
+      dist: opts && opts.dist !== undefined ? opts.dist : viewDist(body),
       instant: opts && opts.instant,
       sunward: opts && opts.instant ? true : undefined
     });
@@ -214,6 +214,8 @@
         UI.setLive('');
       }
       UI.updateMeasureReadout(SCENE.measureInfo());
+      const am = SCENE.artemisMessage();
+      if (am) UI.toast(am, 5000);
     }
 
     renderer.render(scene, camera);
@@ -255,7 +257,14 @@
       setOrbits: v => { STATE.showOrbits = v; },
       setDrift: v => { rig.autoDrift = v; },
       setLayer: (cat, on) => SCENE.setVisible(cat, on),
-      setMeasure: (a, b) => SCENE.setMeasure(a, b)
+      setMeasure: (a, b) => SCENE.setMeasure(a, b),
+      launchArtemis: () => {
+        if (SCENE.launchArtemis()) {
+          STATE.simJD = ORB.jdNow();
+          UI.setSpeedIdx(0);            /* real-ish pace so the flight is watchable */
+          select('artemis', { dist: 1.3 });
+        }
+      }
     });
 
     setupPicking();

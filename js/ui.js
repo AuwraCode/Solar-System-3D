@@ -261,6 +261,7 @@ const UI = (function () {
     $('btnCloseInfo').addEventListener('click', () => { hideInfo(); });
     $('btnOverview').addEventListener('click', () => { stopTour(true); hooks.overview(); });
     $('btnTour').addEventListener('click', () => tourRunning() ? stopTour() : startTour());
+    $('btnArtemis').addEventListener('click', () => { stopTour(true); hooks.launchArtemis(); });
 
     $('btnZoomIn').addEventListener('click', () => hooks.zoom(0.45));
     $('btnZoomOut').addEventListener('click', () => hooks.zoom(2.2));

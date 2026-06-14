@@ -997,6 +997,23 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'artemis', name: 'Artemis (Orion)', kind: 'craft', color: 0x9fd8ff,
+      craft: 'artemis',
+      rows: [
+        ['Programme', 'NASA Artemis — return to the Moon'],
+        ['Vehicle', 'Orion capsule on the SLS rocket'],
+        ['Crew', 'up to 4 astronauts'],
+        ['Journey', '~380,000 km, about 3 days each way'],
+        ['Goal', 'a lasting human presence on and around the Moon']
+      ],
+      blurb: 'Humanity’s return to the Moon. NASA’s Artemis programme flies the Orion capsule atop the giant SLS rocket — Artemis I tested it uncrewed in 2022, and crewed flights aim to land the first woman and next man near the lunar south pole.',
+      fun: [
+        'Press the 🚀 Artemis button to fly the mission from Earth to the Moon.',
+        'Orion travelled farther from Earth than any crew-rated spacecraft ever has.',
+        'Artemis is named after Apollo’s twin sister in Greek myth.'
+      ]
+    },
+    {
       id: 'belt', name: 'Asteroid Belt', kind: 'region', color: 0x8a8478,
       view: { pos: [2.7, 0.18, 0.4], dist: 130 },
       rows: [
