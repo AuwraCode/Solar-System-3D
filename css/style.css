@@ -331,6 +331,44 @@ button.active { background: rgba(50, 90, 160, 0.65); border-color: var(--accent)
   #cornerRight { display: none; }
 }
 
+/* ---------- size comparison ---------- */
+
+#sizeCompare {
+  position: fixed; inset: 0;
+  background: rgba(2, 4, 10, 0.86);
+  z-index: 45;
+  display: none;
+  flex-direction: column;
+  backdrop-filter: blur(6px);
+}
+#sizeCompare.open { display: flex; }
+.sc-inner {
+  margin: auto; width: 96vw; max-width: 1200px;
+  display: flex; flex-direction: column;
+}
+.sc-head { display: flex; align-items: center; gap: 12px; padding: 0 6px 10px; }
+.sc-head h2 { font-size: 15px; letter-spacing: 0.18em; text-transform: uppercase; color: #eaf2ff; }
+#btnCloseSizes { margin-left: auto; padding: 2px 9px; border-radius: 7px; }
+.sc-row {
+  display: flex; align-items: flex-end; gap: 26px;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 10px 14px 18px;
+  min-height: 420px;
+}
+.sc-item { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: none; }
+.sc-ball { border-radius: 50%; flex: none; position: relative; box-shadow: inset -8px -8px 24px rgba(0,0,0,0.55); }
+.sc-ball.ringed::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 230%; height: 46%;
+  transform: translate(-50%, -50%) rotate(-16deg);
+  border: 2px solid rgba(220, 200, 150, 0.5);
+  border-radius: 50%;
+}
+.sc-cap { text-align: center; font-size: 12px; color: var(--txt); }
+.sc-cap b { display: block; font-size: 12.5px; color: #eaf2ff; letter-spacing: 0.04em; }
+.sc-cap span { color: var(--txt-dim); font-size: 10.5px; }
+.sc-note { padding: 4px 16px 12px; font-size: 11.5px; color: var(--txt-dim); line-height: 1.5; }
+
 /* ---------- layers panel ---------- */
 
 #layers {

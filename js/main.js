@@ -139,7 +139,9 @@
       const k = e.key.toLowerCase();
       if (k === 'escape') {
         UI.stopTour(true);
-        if (document.getElementById('help').classList.contains('open')) {
+        if (document.getElementById('sizeCompare').classList.contains('open')) {
+          document.getElementById('sizeCompare').classList.remove('open');
+        } else if (document.getElementById('help').classList.contains('open')) {
           document.getElementById('help').classList.remove('open');
         } else if (document.getElementById('drawer').classList.contains('open')) {
           document.getElementById('drawer').classList.remove('open');
@@ -261,6 +263,7 @@
     const hash = location.hash.replace('#', '');
     if (hash && SCENE.byId[hash]) select(hash, { instant: true });
     else overview();
+    if (hash === 'sizes') UI.openSizes();
     clock = new THREE.Clock();
     animate();
 

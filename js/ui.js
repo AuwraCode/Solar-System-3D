@@ -112,6 +112,32 @@ const UI = (function () {
     });
   }
 
+  /* ---------- size comparison ---------- */
+
+  function buildSizes() {
+    const order = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+    const SCALE = 330 / (2 * DATA.byId.jupiter.radiusKm);
+    const row = $('scRow');
+    row.innerHTML = '';
+    for (const id of order) {
+      const d = DATA.byId[id];
+      if (!d) continue;
+      const px = Math.max(6, Math.round(2 * d.radiusKm * SCALE));
+      const hex = cssColor(d.color);
+      const km = Math.round(2 * d.radiusKm).toLocaleString('en-US');
+      const item = document.createElement('div');
+      item.className = 'sc-item';
+      item.innerHTML =
+        `<div class="sc-ball${d.rings === 'saturn' ? ' ringed' : ''}" style="width:${px}px;height:${px}px;` +
+        `background:radial-gradient(circle at 34% 30%, rgba(255,255,255,0.5), ${hex} 58%, rgba(0,0,0,0.35));"></div>` +
+        `<div class="sc-cap"><b>${d.name}</b><span>${km} km</span></div>`;
+      row.appendChild(item);
+    }
+  }
+
+  function openSizes() { $('sizeCompare').classList.add('open'); }
+  function closeSizes() { $('sizeCompare').classList.remove('open'); }
+
   function toggleDrawer(open) {
     const d = $('drawer');
     const want = open === undefined ? !d.classList.contains('open') : open;
@@ -183,6 +209,9 @@ const UI = (function () {
   function init(h) {
     hooks = h;
     buildNav();
+    buildSizes();
+    $('btnSizes').addEventListener('click', openSizes);
+    $('btnCloseSizes').addEventListener('click', closeSizes);
 
     $('btnNav').addEventListener('click', () => toggleDrawer());
     $('btnCloseDrawer').addEventListener('click', () => toggleDrawer(false));
@@ -218,7 +247,7 @@ const UI = (function () {
 
   return {
     init, tick, showInfo, hideInfo, setLive, toast, setBreadcrumb,
-    startTour, stopTour, tourRunning,
+    startTour, stopTour, tourRunning, openSizes,
     setSpeedIdx, get paused() { return paused; },
     speeds: SPEEDS
   };

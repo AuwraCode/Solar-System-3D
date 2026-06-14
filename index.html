@@ -22,6 +22,7 @@
     <label><input type="checkbox" id="chkOrbits" checked> Orbits</label>
   </div>
   <button id="btnLayers" title="Show / hide layers">⧉ Layers</button>
+  <button id="btnSizes" title="Compare sizes to scale">⚖ Sizes</button>
   <button id="btnOverview" title="Full system view (Esc)">⌂</button>
   <button id="btnHelp" title="Help (H)">?</button>
 </div>
@@ -117,6 +118,17 @@
       everything stays visible; heliocentric distances are to scale.
     </p>
     <button id="btnCloseHelp">Close</button>
+  </div>
+</div>
+
+<div id="sizeCompare">
+  <div class="sc-inner">
+    <div class="sc-head">
+      <h2>Planets to scale</h2>
+      <button id="btnCloseSizes">✕</button>
+    </div>
+    <div class="sc-row" id="scRow"></div>
+    <p class="sc-note">True relative sizes (diameters). Distances are <em>not</em> to scale here — and the Sun is about 10× wider than Jupiter, far too big to fit on this row.</p>
   </div>
 </div>
 
