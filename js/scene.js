@@ -9,7 +9,7 @@ const SCENE = (function () {
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
   let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [], auroraRings = [], pulsars = [];
-  let trojans = [];
+  let trojans = [], constellationLines = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -1203,6 +1203,7 @@ const SCENE = (function () {
       line.frustumCulled = false;
       scene.add(line);
       staticObjs.push(line);
+      constellationLines.push(line);
     }
 
     /* black holes — event horizon shadow + swirling accretion disk + photon ring */
@@ -1315,6 +1316,33 @@ const SCENE = (function () {
     for (const b of bodies) if (b.fixed) b.wp.setFromMatrixPosition(b.group.matrixWorld);
 
     progress('Ready');
+  }
+
+  /* ---------- layer visibility (show / hide categories) ---------- */
+
+  const LAYER_KINDS = {
+    planets: ['planet'], moons: ['moon'], dwarfs: ['dwarf'],
+    comets: ['comet'], craft: ['craft'], stars: ['star'],
+    deepsky: ['galaxy', 'nebula', 'blackhole', 'pulsar']
+  };
+
+  function setVisible(cat, on) {
+    if (cat === 'asteroids') {
+      if (beltMesh) beltMesh.visible = on;
+      if (kuiperPts) kuiperPts.visible = on;
+      for (const t of trojans) t.pts.visible = on;
+      return;
+    }
+    const kinds = LAYER_KINDS[cat];
+    if (!kinds) return;
+    for (const b of bodies) {
+      if (b.def.id === 'sun') continue;        /* the Sun always stays */
+      if (kinds.indexOf(b.def.kind) >= 0) {
+        b.layerHidden = !on;
+        b.group.visible = on;
+      }
+    }
+    if (cat === 'stars') for (const l of constellationLines) l.visible = on;
   }
 
   /* ---------- per-frame ---------- */
@@ -1538,6 +1566,13 @@ const SCENE = (function () {
 
     for (const b of bodies) {
       if (!b.marker && !b.labelEl) continue;
+      if (b.layerHidden) {
+        if (b.marker) b.marker.visible = false;
+        if (b.labelEl) b.labelEl.style.display = 'none';
+        if (b.orbitLine) b.orbitLine.visible = false;
+        if (b.moonLine) b.moonLine.visible = false;
+        continue;
+      }
       const dist = camPos.distanceTo(b.wp);
       const meshPx = b.dispRad / (Math.max(dist, 0.001) * tanHalf) * (h / 2);
 
@@ -1648,7 +1683,7 @@ const SCENE = (function () {
   function screenPick(x, y, camera, w, h) {
     let best = null, bestD = 26;
     for (const b of bodies) {
-      if (b.def.kind === 'region') continue;
+      if (b.def.kind === 'region' || b.layerHidden) continue;
       if (b.marker && !b.marker.visible && b.labelEl.style.display === 'none') {
         /* still allow planets/sun when mesh is big on screen */
         const dist = camera.position.distanceTo(b.wp);
@@ -1673,13 +1708,17 @@ const SCENE = (function () {
     for (const h of hits) {
       let o = h.object;
       while (o && !o.userData.bodyId) o = o.parent;
-      if (o) return byId[o.userData.bodyId];
+      if (o) {
+        const b = byId[o.userData.bodyId];
+        if (b && b.layerHidden) continue;   /* don't pick objects on a hidden layer */
+        if (b) return b;
+      }
     }
     return null;
   }
 
   return {
-    build, update, updateView, screenPick, raycastPick,
+    build, update, updateView, screenPick, raycastPick, setVisible,
     bodies, byId,
     onSelect: null
   };

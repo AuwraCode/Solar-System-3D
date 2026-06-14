@@ -250,7 +250,8 @@
       resetTime: () => { STATE.simJD = ORB.jdNow(); },
       setLabels: v => { STATE.showLabels = v; },
       setOrbits: v => { STATE.showOrbits = v; },
-      setDrift: v => { rig.autoDrift = v; }
+      setDrift: v => { rig.autoDrift = v; },
+      setLayer: (cat, on) => SCENE.setVisible(cat, on)
     });
 
     setupPicking();

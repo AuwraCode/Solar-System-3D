@@ -331,6 +331,32 @@ button.active { background: rgba(50, 90, 160, 0.65); border-color: var(--accent)
   #cornerRight { display: none; }
 }
 
+/* ---------- layers panel ---------- */
+
+#layers {
+  position: fixed; top: 52px; right: 14px;
+  z-index: 12;
+  display: none;
+  flex-direction: column; gap: 2px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+#layers.open { display: flex; }
+.layers-title {
+  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--txt-dim); margin-bottom: 6px;
+}
+#layers label {
+  display: flex; gap: 8px; align-items: center; cursor: pointer;
+  font-size: 12.5px; padding: 3px 4px; border-radius: 6px;
+}
+#layers label:hover { background: rgba(50, 90, 160, 0.25); }
+#layers input { accent-color: var(--accent); }
+
 /* ---------- cinema / photo mode (press C) ---------- */
 
 body.cinema #topbar,
@@ -338,7 +364,8 @@ body.cinema #timebar,
 body.cinema #cornerRight,
 body.cinema #disclaimer,
 body.cinema #infoPanel,
-body.cinema #drawer {
+body.cinema #drawer,
+body.cinema #layers {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;

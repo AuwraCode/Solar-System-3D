@@ -204,6 +204,11 @@ const UI = (function () {
     $('chkLabels').addEventListener('change', e => hooks.setLabels(e.target.checked));
     $('chkOrbits').addEventListener('change', e => hooks.setOrbits(e.target.checked));
 
+    $('btnLayers').addEventListener('click', () => $('layers').classList.toggle('open'));
+    for (const cb of document.querySelectorAll('#layers input[data-layer]')) {
+      cb.addEventListener('change', e => hooks.setLayer(e.target.dataset.layer, e.target.checked));
+    }
+
     pushTime();
   }
 
