@@ -5,6 +5,7 @@ const SCENE = (function () {
   const pickMeshes = [];
   let root, rendererRef, labelBox, camRef;
   let sunUniforms, earthUniforms, sunCorona, sunCore;
+  let ringShadow = null;       // Saturn's shadow cast across its rings
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
   let sunProms = [], meteors = [], bhDisks = [], fountains = [];
@@ -252,6 +253,36 @@ const SCENE = (function () {
       uv.setXY(i, (v.length() - inner) / (outer - inner), 0.5);
     }
     return g;
+  }
+
+  /* Patch a ring's Lambert material so fragments lying in the planet's
+     cylindrical shadow (anti-sun side, within the planet's silhouette) darken —
+     the iconic black band Saturn casts across its rings. Returns the live
+     uniform whose uSunLocal the per-frame loop points away from the Sun. */
+  function applyRingShadow(mat, shadowR) {
+    const uni = {
+      uSunLocal: { value: new THREE.Vector3(1, 0, 0) },
+      uShadowR: { value: shadowR }
+    };
+    mat.onBeforeCompile = shader => {
+      shader.uniforms.uSunLocal = uni.uSunLocal;
+      shader.uniforms.uShadowR = uni.uShadowR;
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vRingPos;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\n  vRingPos = position;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>',
+          '#include <common>\nvarying vec3 vRingPos;\nuniform vec3 uSunLocal;\nuniform float uShadowR;')
+        .replace('#include <output_fragment>',
+          'float _pd = dot(vRingPos, uSunLocal);\n' +
+          'if (_pd < 0.0) {\n' +
+          '  float _perp = length(vRingPos - _pd * uSunLocal);\n' +
+          '  outgoingLight *= mix(0.12, 1.0, smoothstep(uShadowR * 0.92, uShadowR * 1.2, _perp));\n' +
+          '}\n' +
+          '#include <output_fragment>');
+    };
+    mat.customProgramCacheKey = () => 'ringShadow';
+    return uni;
   }
 
   function makeAtmo(r, opts) {
@@ -750,13 +781,20 @@ const SCENE = (function () {
       if (def.atmo) tiltG.add(makeAtmo(def.dispRad, def.atmo));
 
       if (def.rings === 'saturn') {
-        const ring = new THREE.Mesh(ringGeometry(def.dispRad * 1.24, def.dispRad * 2.27),
-          new THREE.MeshLambertMaterial({
-            map: TEX.texSaturnRings(), transparent: true, side: THREE.DoubleSide,
-            depthWrite: false, alphaTest: 0.02, emissive: 0x2a2418
-          }));
+        const ringMat = new THREE.MeshLambertMaterial({
+          map: TEX.texSaturnRings(), transparent: true, side: THREE.DoubleSide,
+          depthWrite: false, alphaTest: 0.02, emissive: 0x2a2418
+        });
+        const ring = new THREE.Mesh(ringGeometry(def.dispRad * 1.24, def.dispRad * 2.27), ringMat);
         ring.rotation.x = -Math.PI / 2;
         tiltG.add(ring);
+        /* ring world-rotation is constant (Rz(tilt) then Rx(-90)); cache its
+           inverse so we can drop the world sun-direction into ring-local space */
+        const tiltRad = THREE.MathUtils.degToRad(def.tilt || 0);
+        const qWorld = new THREE.Quaternion()
+          .setFromAxisAngle(new THREE.Vector3(0, 0, 1), tiltRad)
+          .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2));
+        ringShadow = { uni: applyRingShadow(ringMat, def.dispRad), invQ: qWorld.invert(), id: def.id };
       } else if (def.rings === 'uranus') {
         const ring = new THREE.Mesh(ringGeometry(def.dispRad * 1.55, def.dispRad * 2.05),
           new THREE.MeshLambertMaterial({
@@ -1257,6 +1295,13 @@ const SCENE = (function () {
     if (earthUniforms) {
       earthUniforms.sunDir.value.copy(byId.earth.group.position).negate().normalize();
       earthUniforms.uTime.value = sunUniforms.uTime.value;
+    }
+
+    /* Saturn's shadow on its rings: shadow axis points away from the Sun, in
+       the ring's local frame */
+    if (ringShadow) {
+      _v1.copy(byId[ringShadow.id].group.position).negate().normalize().applyQuaternion(ringShadow.invQ);
+      ringShadow.uni.uSunLocal.value.copy(_v1);
     }
 
     /* comets */
