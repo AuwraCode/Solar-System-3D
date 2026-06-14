@@ -1525,6 +1525,38 @@ const DATA = (function () {
       blurb: 'Part of the backwards-question-mark "Sickle" that forms the Lion’s head and mane.',
       fun: ['Its name means "the curl" or "braid" of the lion’s mane.']
     },
+    {
+      id: 'sadr', name: 'Sadr', kind: 'star', color: 0xfff4e8,
+      star: { ra: 305.557, dec: 40.257, mag: 2.23, spect: '#fff4e8' },
+      rows: [['Constellation', 'Cygnus (centre)'], ['Distance', '~1,800 light-years'],
+        ['Type', 'F8 yellow supergiant'], ['Apparent magnitude', '2.23']],
+      blurb: 'The luminous supergiant at the heart of the Northern Cross, set in a glowing field of nebulosity.',
+      fun: ['It is roughly 33,000 times brighter than the Sun.', 'Its name is Arabic for "the chest" of the swan.']
+    },
+    {
+      id: 'gienah_cyg', name: 'Aljanah', kind: 'star', color: 0xffd6ac,
+      star: { ra: 311.553, dec: 33.970, mag: 2.48, spect: '#ffd6ac' },
+      rows: [['Constellation', 'Cygnus (wing)'], ['Distance', '~73 light-years'],
+        ['Type', 'K0 orange giant'], ['Apparent magnitude', '2.48']],
+      blurb: 'An orange giant marking one wingtip of Cygnus the Swan.',
+      fun: ['Its name is Arabic for "the wing".', 'It has a faint companion star detected by its tug.']
+    },
+    {
+      id: 'albireo', name: 'Albireo', kind: 'star', color: 0xffce9c,
+      star: { ra: 292.680, dec: 27.960, mag: 3.18, spect: '#ffce9c' },
+      rows: [['Constellation', 'Cygnus (head/beak)'], ['Distance', '~430 light-years'],
+        ['Type', 'K3 gold + B8 blue double'], ['Apparent magnitude', '3.18']],
+      blurb: 'Often called the most beautiful double star in the sky: a gold and a sapphire-blue sun side by side in any small telescope.',
+      fun: ['The colour contrast of its two stars is breathtaking through a telescope.', 'It marks the beak of the swan, opposite Deneb at the tail.']
+    },
+    {
+      id: 'fawaris', name: 'Fawaris', kind: 'star', color: 0xcfe0ff,
+      star: { ra: 296.243, dec: 45.131, mag: 2.87, spect: '#cfe0ff' },
+      rows: [['Constellation', 'Cygnus (wing)'], ['Distance', '~165 light-years'],
+        ['Type', 'B9 blue-white'], ['Apparent magnitude', '2.87']],
+      blurb: 'A blue-white star forming the other wing of the Swan, also called Delta Cygni.',
+      fun: ['In about 11,000 years it will become the northern pole star.']
+    },
 
     /* ---- black holes ---- */
     {
@@ -1652,6 +1684,9 @@ const DATA = (function () {
     { name: 'Leo', pairs: [
       ['regulus', 'algieba'], ['algieba', 'adhafera'], ['algieba', 'zosma'],
       ['zosma', 'denebola'], ['denebola', 'chort'], ['chort', 'regulus']
+    ] },
+    { name: 'Cygnus', pairs: [
+      ['deneb', 'sadr'], ['sadr', 'albireo'], ['sadr', 'gienah_cyg'], ['sadr', 'fawaris']
     ] }
   ];
 
