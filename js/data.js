@@ -902,6 +902,24 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'parker', name: 'Parker Solar Probe', kind: 'craft', color: 0xffd166,
+      craft: 'probe',
+      elements: { a: 0.388, e: 0.854, i: 3.4, O: 178.0, wbar: 58.0, L: 120.0, P: 88 },
+      rows: [
+        ['Launched', '12 August 2018'],
+        ['Closest approach', '~6.1 million km from the Sun’s surface'],
+        ['Top speed', '~692,000 km/h — the fastest human-made object'],
+        ['Orbit', '88-day loop, tightened by 7 Venus flybys'],
+        ['Shield', 'a 2,500 °C carbon heat shield']
+      ],
+      blurb: 'The first spacecraft to "touch" the Sun, diving through its outer atmosphere — the corona — again and again to learn why it is hotter than the surface below.',
+      fun: [
+        'It is the fastest object humans have ever built.',
+        'Behind its heat shield, the instruments stay near room temperature.',
+        'It flew through the Sun’s corona for the first time in 2021.'
+      ]
+    },
+    {
       id: 'belt', name: 'Asteroid Belt', kind: 'region', color: 0x8a8478,
       view: { pos: [2.7, 0.18, 0.4], dist: 130 },
       rows: [

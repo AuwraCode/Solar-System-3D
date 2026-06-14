@@ -988,6 +988,19 @@ const SCENE = (function () {
         scene.add(line);
         staticObjs.push(line);
         rt.orbitLine = line;
+      } else if (def.elements) {
+        /* a craft that orbits the Sun (e.g. Parker Solar Probe) gets a real
+           heliocentric orbit line, like the planets */
+        const pts = ORB.orbitPoints(def.elements, 256);
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+        const line = new THREE.LineLoop(geo, new THREE.LineBasicMaterial({
+          color: def.color, transparent: true, opacity: 0.32, depthWrite: false
+        }));
+        line.renderOrder = -5;
+        scene.add(line);
+        staticObjs.push(line);
+        rt.orbitLine = line;
       }
     }
 
