@@ -171,6 +171,10 @@
       else if (k === ' ') { e.preventDefault(); document.getElementById('btnPause').click(); }
       else if (k === ',') document.getElementById('btnSlower').click();
       else if (k === '.') document.getElementById('btnFaster').click();
+      else if (k === 'c') {
+        const on = document.body.classList.toggle('cinema');
+        if (on) UI.toast('🎬 Cinema mode — press C to bring the controls back.');
+      }
       else if (k === 'h' || k === '?') document.getElementById('help').classList.toggle('open');
       else if (k === 't') document.getElementById('btnTour').click();
     });
