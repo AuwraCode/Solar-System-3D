@@ -309,6 +309,51 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'mimas', name: 'Mimas', kind: 'moon', parent: 'saturn', color: 0xd6dde2,
+      radiusKm: 198.2, sync: true,
+      orbit: { periodD: 0.942, distF: 2.2, incl: 1.57 },
+      rows: [
+        ['Diameter', '396 km'],
+        ['Feature', 'the giant Herschel crater'],
+        ['Orbital period', '0.94 days']
+      ],
+      blurb: 'The "Death Star moon" — one colossal impact crater, Herschel, makes Mimas look uncannily like the Star Wars battle station.',
+      fun: [
+        'The impact that made Herschel nearly shattered the whole moon.',
+        'Despite its icy crust it may hide a young subsurface ocean.'
+      ]
+    },
+    {
+      id: 'tethys', name: 'Tethys', kind: 'moon', parent: 'saturn', color: 0xe2e8ee,
+      radiusKm: 531, sync: true,
+      orbit: { periodD: 1.888, distF: 3.0, incl: 1.12 },
+      rows: [
+        ['Diameter', '1,062 km'],
+        ['Feature', 'the vast Ithaca Chasma canyon'],
+        ['Orbital period', '1.89 days']
+      ],
+      blurb: 'An icy moon scarred by a canyon stretching three-quarters of the way around it, and by Odysseus, one of the largest craters in the Solar System.',
+      fun: [
+        'It is almost pure water ice, making it brilliantly white.',
+        'Ithaca Chasma may have opened as its interior ocean froze and expanded.'
+      ]
+    },
+    {
+      id: 'dione', name: 'Dione', kind: 'moon', parent: 'saturn', color: 0xdfe5ea,
+      radiusKm: 561.4, sync: true,
+      orbit: { periodD: 2.737, distF: 3.25, incl: 0.02 },
+      rows: [
+        ['Diameter', '1,123 km'],
+        ['Feature', 'bright "wispy" ice cliffs'],
+        ['Orbital period', '2.74 days']
+      ],
+      blurb: 'An icy moon laced with bright streaks that turned out to be towering cliffs of fresh ice fractured across its trailing hemisphere.',
+      fun: [
+        'It has a wisp-thin oxygen atmosphere.',
+        'It may harbour a deep liquid-water ocean beneath its crust.'
+      ]
+    },
+    {
       id: 'rhea', name: 'Rhea', kind: 'moon', parent: 'saturn', color: 0xcfcac2,
       radiusKm: 763.8, sync: true,
       orbit: { periodD: 4.5182, distF: 3.5, incl: 0.35 },

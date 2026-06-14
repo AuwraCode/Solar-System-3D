@@ -1106,6 +1106,9 @@ const TEX = (function () {
       t.needsUpdate = true;
       return t;
     },
+    mimas: () => genericIce(441, 178, false), tethys: () => genericIce(451, 186, false),
+    dione: () => genericIce(461, 182, false),
+    ariel: () => genericIce(471, 176, false), umbriel: () => genericIce(481, 138, false),
     miranda: texMiranda,
     titania: () => genericIce(421, 142, true),
     oberon: () => genericIce(431, 118, true),
