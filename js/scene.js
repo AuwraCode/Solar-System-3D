@@ -831,6 +831,18 @@ const SCENE = (function () {
         tiltG.add(ring);
       }
 
+      /* faint dusty rings (Jupiter, Neptune) — additive so they read against black */
+      if (def.dustRing) {
+        const dr = def.dustRing;
+        const ring = new THREE.Mesh(ringGeometry(def.dispRad * dr.i, def.dispRad * dr.o),
+          new THREE.MeshBasicMaterial({
+            color: dr.color, transparent: true, opacity: dr.op, side: THREE.DoubleSide,
+            depthWrite: false, blending: THREE.AdditiveBlending
+          }));
+        ring.rotation.x = -Math.PI / 2;
+        tiltG.add(ring);
+      }
+
       /* glowing auroral caps hovering over the magnetic poles of the gas giants */
       if (def.aurora) {
         const auroraTex = TEX.spriteGlow('rgba(255,255,255,0.9)', 'rgba(255,255,255,0)');
