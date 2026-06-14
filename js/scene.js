@@ -475,6 +475,13 @@ const SCENE = (function () {
     craftMats();
     const tick = () => new Promise(r => setTimeout(r, 0));
 
+    /* Objects that never move once placed: collected here, then frozen at the
+       end of build() so the per-frame scene-graph matrix update skips them.
+       staticObjs = fully static subtrees; staticLocal = static position but an
+       animated child (e.g. a spinning galaxy disk) keeps updating. */
+    const staticObjs = [];
+    const staticLocal = [];
+
     /* sky */
     progress('Painting the Milky Way…');
     await tick();
@@ -486,6 +493,7 @@ const SCENE = (function () {
     milky.rotation.y = 1.7;
     milky.renderOrder = -10;
     scene.add(milky);
+    staticObjs.push(milky);
 
     const starGroups = [[2600, 1.3, 0.75], [2600, 2.0, 0.9], [900, 3.0, 1.0]];
     const rng = NZ.mulberry32(555);
@@ -522,6 +530,7 @@ const SCENE = (function () {
       p.renderOrder = -9;
       p.frustumCulled = false;
       scene.add(p);
+      staticObjs.push(p);
     }
 
     /* shooting stars: brief additive streaks that cross the sky now and then */
@@ -537,6 +546,7 @@ const SCENE = (function () {
       line.renderOrder = 3;
       line.visible = false;
       scene.add(line);
+      staticObjs.push(line);
       meteors.push({
         line, pos: new THREE.Vector3(), vel: new THREE.Vector3(), color: new THREE.Color(),
         len: 1, life: 1, age: 0, active: false, delay: 1 + Math.random() * 8
@@ -676,6 +686,7 @@ const SCENE = (function () {
       }));
       line.renderOrder = -5;
       scene.add(line);
+      staticObjs.push(line);
       rt.orbitLine = line;
     }
 
@@ -769,6 +780,7 @@ const SCENE = (function () {
       const ion = makeTrail(420, 0.5, 0x66aaff);
       const dust = makeTrail(420, 0.85, 0xfff0cc);
       scene.add(ion.pts); scene.add(dust.pts);
+      staticObjs.push(ion.pts, dust.pts);   /* identity transform; only geometry updates */
       comets.push({ rt, coma, ion, dust });
 
       const pts = ORB.orbitPoints(def.elements, 512);
@@ -779,6 +791,7 @@ const SCENE = (function () {
       }));
       line.renderOrder = -5;
       scene.add(line);
+      staticObjs.push(line);
       rt.orbitLine = line;
     }
 
@@ -812,6 +825,7 @@ const SCENE = (function () {
         }));
         line.renderOrder = -5;
         scene.add(line);
+        staticObjs.push(line);
         rt.orbitLine = line;
       }
     }
@@ -876,6 +890,7 @@ const SCENE = (function () {
       scene.add(group);
       const rt = registerBody(def, group, null, null);
       rt.dispRad = def.id === 'belt' ? 5 : 60;
+      staticObjs.push(group);
     }
 
     /* galaxies — distant disks on the celestial sphere, facing the inner system */
@@ -909,6 +924,7 @@ const SCENE = (function () {
       rt.galaxyPlane = plane;
       rt.galaxySpin = def.galaxy.spin || 0;
       hitSphere(rt, def.dispRad * 0.85);
+      staticLocal.push(group);   /* fixed in the sky; only the disk plane spins */
     }
 
     /* famous stars — bright named suns on a distant celestial shell, placed
@@ -934,6 +950,7 @@ const SCENE = (function () {
       const rt = registerBody(def, group, null, null);
       rt.starGlow = glow;
       hitSphere(rt, def.dispRad * 1.5);
+      staticObjs.push(group);
     }
 
     /* constellation lines tracing Orion and the Big Dipper */
@@ -955,6 +972,7 @@ const SCENE = (function () {
       line.renderOrder = -7;
       line.frustumCulled = false;
       scene.add(line);
+      staticObjs.push(line);
     }
 
     /* black holes — event horizon shadow + swirling accretion disk + photon ring */
@@ -994,6 +1012,7 @@ const SCENE = (function () {
       scene.add(group);
       const rt = registerBody(def, group, horizon, null);
       hitSphere(rt, def.dispRad);
+      staticObjs.push(group);   /* disk swirl is shader-driven, not transform-driven */
     }
 
     /* nebulae — glowing clouds of gas and newborn (or dead) stars */
@@ -1010,6 +1029,19 @@ const SCENE = (function () {
       scene.add(group);
       const rt = registerBody(def, group, null, null);
       hitSphere(rt, def.dispRad);
+      staticObjs.push(group);
+    }
+
+    /* freeze the static set: bake their world matrices once and stop them from
+       being touched by every frame's scene-graph traversal */
+    for (const o of staticObjs) {
+      o.updateMatrixWorld(true);
+      o.matrixAutoUpdate = false;
+      o.matrixWorldAutoUpdate = false;
+    }
+    for (const o of staticLocal) {
+      o.updateMatrix();          /* bake local transform from its position */
+      o.matrixAutoUpdate = false; /* keep matrixWorldAutoUpdate so children animate */
     }
 
     progress('Ready');
@@ -1159,8 +1191,10 @@ const SCENE = (function () {
 
     kuiperPts.rotation.y = simDays * 2 * Math.PI / (365.25 * 270);
 
-    /* cache world positions */
-    root.updateMatrixWorld(true);
+    /* cache world positions — non-forced so the frozen static subtrees (galaxies,
+       stars, nebulae, orbit lines, sky) are skipped; movers still propagate via
+       their dirty flags */
+    root.updateMatrixWorld();
     for (const b of bodies) b.wp.setFromMatrixPosition(b.group.matrixWorld);
   }
 
