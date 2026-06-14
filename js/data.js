@@ -1453,6 +1453,38 @@ const DATA = (function () {
       blurb: 'The faint blue star at one end of the "W", closing off the constellation Cassiopeia.',
       fun: ['It is a hot, luminous giant burning through its fuel quickly.']
     },
+    {
+      id: 'acrux', name: 'Acrux', kind: 'star', color: 0xaabfff,
+      star: { ra: 186.650, dec: -63.099, mag: 0.77, spect: '#aabfff' },
+      rows: [['Constellation', 'Crux (foot of the cross)'], ['Distance', '~320 light-years'],
+        ['Type', 'B0 blue multiple star'], ['Apparent magnitude', '0.77']],
+      blurb: 'The brightest star of the Southern Cross and the most southerly first-magnitude star — actually a tight cluster of hot blue suns.',
+      fun: ['It appears on the flags of Australia, New Zealand, Brazil and others.', 'A small telescope splits it into a dazzling blue pair.']
+    },
+    {
+      id: 'mimosa', name: 'Mimosa', kind: 'star', color: 0xaec4ff,
+      star: { ra: 191.930, dec: -59.689, mag: 1.25, spect: '#aec4ff' },
+      rows: [['Constellation', 'Crux'], ['Distance', '~280 light-years'],
+        ['Type', 'B0.5 blue giant'], ['Apparent magnitude', '1.25']],
+      blurb: 'The second-brightest star of the Southern Cross, a hot blue giant that pulsates many times an hour.',
+      fun: ['It is one of the hottest naked-eye stars, near 27,000 °C.', 'Also called Becrux.']
+    },
+    {
+      id: 'gacrux', name: 'Gacrux', kind: 'star', color: 0xffcaa0,
+      star: { ra: 187.791, dec: -57.113, mag: 1.63, spect: '#ffcaa0' },
+      rows: [['Constellation', 'Crux (top of the cross)'], ['Distance', '~89 light-years'],
+        ['Type', 'M3.5 red giant'], ['Apparent magnitude', '1.63']],
+      blurb: 'The red giant crowning the Southern Cross — its ruddy glow is a striking contrast to the cross’s blue stars.',
+      fun: ['It is the nearest red giant to the Sun.', 'A line from Gacrux through Acrux points toward the south celestial pole.']
+    },
+    {
+      id: 'imai', name: 'Imai', kind: 'star', color: 0xbcd4ff,
+      star: { ra: 183.786, dec: -58.749, mag: 2.79, spect: '#bcd4ff' },
+      rows: [['Constellation', 'Crux'], ['Distance', '~345 light-years'],
+        ['Type', 'B2 blue subgiant'], ['Apparent magnitude', '2.79']],
+      blurb: 'The faintest of the four main stars of the Southern Cross, forming the left arm.',
+      fun: ['Also known as Delta Crucis.', 'It is a Beta Cephei-type pulsating variable.']
+    },
 
     /* ---- black holes ---- */
     {
@@ -1573,6 +1605,9 @@ const DATA = (function () {
     ] },
     { name: 'Cassiopeia', pairs: [
       ['caph', 'schedar'], ['schedar', 'navi'], ['navi', 'ruchbah'], ['ruchbah', 'segin']
+    ] },
+    { name: 'Crux', pairs: [
+      ['gacrux', 'acrux'], ['mimosa', 'imai']
     ] }
   ];
 
