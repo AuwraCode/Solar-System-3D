@@ -1485,6 +1485,46 @@ const DATA = (function () {
       blurb: 'The faintest of the four main stars of the Southern Cross, forming the left arm.',
       fun: ['Also known as Delta Crucis.', 'It is a Beta Cephei-type pulsating variable.']
     },
+    {
+      id: 'denebola', name: 'Denebola', kind: 'star', color: 0xeaf0ff,
+      star: { ra: 177.265, dec: 14.572, mag: 2.11, spect: '#eaf0ff' },
+      rows: [['Constellation', 'Leo (tail)'], ['Distance', '~36 light-years'],
+        ['Type', 'A3 white'], ['Apparent magnitude', '2.11']],
+      blurb: 'The tail of the Lion — a young, fast-spinning white star encircled by a disk of dust.',
+      fun: ['Its name is Arabic for "the lion’s tail".', 'It is only about 100 million years old.']
+    },
+    {
+      id: 'algieba', name: 'Algieba', kind: 'star', color: 0xffd2a1,
+      star: { ra: 154.993, dec: 19.842, mag: 2.08, spect: '#ffd2a1' },
+      rows: [['Constellation', 'Leo (mane)'], ['Distance', '~130 light-years'],
+        ['Type', 'K0 orange giant pair'], ['Apparent magnitude', '2.08']],
+      blurb: 'A glorious golden double star in the Lion’s mane, two giants slowly circling each other.',
+      fun: ['One of its stars hosts a confirmed giant planet.', 'Its name means "the forehead" of the lion.']
+    },
+    {
+      id: 'zosma', name: 'Zosma', kind: 'star', color: 0xeef2ff,
+      star: { ra: 168.527, dec: 20.524, mag: 2.56, spect: '#eef2ff' },
+      rows: [['Constellation', 'Leo (rump)'], ['Distance', '~58 light-years'],
+        ['Type', 'A4 white'], ['Apparent magnitude', '2.56']],
+      blurb: 'A white star marking the Lion’s hindquarters, flattened by its rapid rotation.',
+      fun: ['Its name is Greek for "girdle".', 'It sits very close to the ecliptic, so the Moon and planets often pass near it.']
+    },
+    {
+      id: 'chort', name: 'Chort', kind: 'star', color: 0xeef2ff,
+      star: { ra: 168.560, dec: 15.430, mag: 3.32, spect: '#eef2ff' },
+      rows: [['Constellation', 'Leo'], ['Distance', '~165 light-years'],
+        ['Type', 'A2 white'], ['Apparent magnitude', '3.32']],
+      blurb: 'A modest white star forming the Lion’s flank, between Zosma and Regulus.',
+      fun: ['Its name comes from Arabic for "the small rib".']
+    },
+    {
+      id: 'adhafera', name: 'Adhafera', kind: 'star', color: 0xfff4e8,
+      star: { ra: 154.173, dec: 23.417, mag: 3.43, spect: '#fff4e8' },
+      rows: [['Constellation', 'Leo (sickle)'], ['Distance', '~270 light-years'],
+        ['Type', 'F0 yellow-white giant'], ['Apparent magnitude', '3.43']],
+      blurb: 'Part of the backwards-question-mark "Sickle" that forms the Lion’s head and mane.',
+      fun: ['Its name means "the curl" or "braid" of the lion’s mane.']
+    },
 
     /* ---- black holes ---- */
     {
@@ -1608,6 +1648,10 @@ const DATA = (function () {
     ] },
     { name: 'Crux', pairs: [
       ['gacrux', 'acrux'], ['mimosa', 'imai']
+    ] },
+    { name: 'Leo', pairs: [
+      ['regulus', 'algieba'], ['algieba', 'adhafera'], ['algieba', 'zosma'],
+      ['zosma', 'denebola'], ['denebola', 'chort'], ['chort', 'regulus']
     ] }
   ];
 
