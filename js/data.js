@@ -175,7 +175,7 @@ const DATA = (function () {
     },
     {
       id: 'jupiter', name: 'Jupiter', kind: 'planet', color: 0xd9a066,
-      radiusKm: 69911, rotH: 9.925, tilt: 3.13,
+      radiusKm: 69911, rotH: 9.925, tilt: 3.13, aurora: { color: 0x7fe0ff },
       atmo: { color: 0xd9b48a, size: 1.035, power: 3.6, intensity: 0.3 },
       elements: { a: 5.20336301, e: 0.04839266, i: 1.3053, O: 100.55615, wbar: 14.75385, L: 34.40438, P: 4332.589 },
       rows: [
@@ -268,7 +268,7 @@ const DATA = (function () {
     },
     {
       id: 'saturn', name: 'Saturn', kind: 'planet', color: 0xe7cf8e,
-      radiusKm: 58232, rotH: 10.656, tilt: 26.73, rings: 'saturn',
+      radiusKm: 58232, rotH: 10.656, tilt: 26.73, rings: 'saturn', aurora: { color: 0x9fb8ff },
       atmo: { color: 0xe8d8a8, size: 1.035, power: 3.6, intensity: 0.25 },
       elements: { a: 9.53707032, e: 0.0541506, i: 2.48446, O: 113.71504, wbar: 92.43194, L: 49.94432, P: 10759.22 },
       rows: [

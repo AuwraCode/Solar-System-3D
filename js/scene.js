@@ -8,7 +8,7 @@ const SCENE = (function () {
   let ringShadow = null;       // Saturn's shadow cast across its rings
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
-  let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [];
+  let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [], auroraRings = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -831,6 +831,21 @@ const SCENE = (function () {
         tiltG.add(ring);
       }
 
+      /* glowing auroral caps hovering over the magnetic poles of the gas giants */
+      if (def.aurora) {
+        const auroraTex = TEX.spriteGlow('rgba(255,255,255,0.9)', 'rgba(255,255,255,0)');
+        for (const s of [1, -1]) {
+          const cap = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: auroraTex, color: def.aurora.color, transparent: true, opacity: 0.7,
+            blending: THREE.AdditiveBlending, depthWrite: false
+          }));
+          cap.position.y = s * def.dispRad * 1.0;
+          cap.scale.set(def.dispRad * 1.0, def.dispRad * 0.58, 1);  /* flattened polar oval */
+          tiltG.add(cap);
+          auroraRings.push({ mat: cap.material, base: 0.95, phase: auroraRings.length * 1.7 });
+        }
+      }
+
       scene.add(group);
       const rt = registerBody(def, group, mesh, null);
       rt.tiltG = tiltG;
@@ -1327,6 +1342,7 @@ const SCENE = (function () {
       pr.holder.scale.setScalar(1 + 0.1 * Math.sin(sunT * pr.freq * 0.8 + pr.phase));
     }
     starTwinkle.value = sunT;
+    for (const a of auroraRings) a.mat.opacity = a.base * (0.62 + 0.38 * Math.sin(sunT * 1.3 + a.phase));
     for (const u of bhDisks) u.uTime.value = sunT;
     updateMeteors(dtReal);
 
