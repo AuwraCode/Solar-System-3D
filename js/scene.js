@@ -8,7 +8,7 @@ const SCENE = (function () {
   let ringShadow = null;       // Saturn's shadow cast across its rings
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
-  let sunProms = [], meteors = [], bhDisks = [], fountains = [];
+  let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -739,6 +739,32 @@ const SCENE = (function () {
     scene.add(sunGroup);
     registerBody(sunDef, sunGroup, sunMesh, null);
 
+    /* lens flare: additive ghosts strung along the line from the Sun through the
+       screen centre, plus an anamorphic streak. Positioned in screen space each
+       frame and shown only when the Sun is in view and unobstructed. */
+    const flareTex = TEX.spriteGlow('rgba(255,255,255,0.95)', 'rgba(255,255,255,0)');
+    flareSprites = [];
+    const flareDefs = [
+      { t: 1.00, size: 0.42, color: 0x9ec2ff, op: 0.32, streak: true },
+      { t: 0.64, size: 0.05, color: 0xffd9a0, op: 0.30 },
+      { t: 0.40, size: 0.10, color: 0x6fa8ff, op: 0.18 },
+      { t: 0.18, size: 0.035, color: 0xfff0c8, op: 0.34 },
+      { t: -0.22, size: 0.13, color: 0x9b7bff, op: 0.14 },
+      { t: -0.46, size: 0.06, color: 0xffcaa0, op: 0.24 },
+      { t: -0.72, size: 0.18, color: 0x6fd0ff, op: 0.12 },
+      { t: -1.06, size: 0.08, color: 0xffe0b0, op: 0.20 }
+    ];
+    for (const fd of flareDefs) {
+      const spr = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: flareTex, color: fd.color, transparent: true, depthWrite: false,
+        depthTest: false, blending: THREE.AdditiveBlending, opacity: 0
+      }));
+      spr.renderOrder = 7;
+      spr.visible = false;
+      scene.add(spr);
+      flareSprites.push({ spr, t: fd.t, size: fd.size, op: fd.op, streak: fd.streak });
+    }
+
     /* planets & dwarfs */
     const helioDefs = DATA.bodies.filter(d => d.elements && (d.kind === 'planet' || d.kind === 'dwarf'));
     for (const def of helioDefs) {
@@ -1364,6 +1390,7 @@ const SCENE = (function () {
   /* ---------- view-dependent: markers, labels, fades ---------- */
 
   const _fwd = new THREE.Vector3();
+  const _right = new THREE.Vector3(), _up = new THREE.Vector3();
   const placed = [];
 
   function updateView(camera, selected, showLabels, showOrbits, w, h) {
@@ -1472,6 +1499,34 @@ const SCENE = (function () {
       el.style.display = 'block';
       el.style.transform = `translate(-50%,-100%) translate(${c.sx.toFixed(1)}px,${c.sy.toFixed(1)}px)`;
       el.classList.toggle('selected', selected === c.b);
+    }
+
+    /* lens flare: ghosts along the Sun -> screen-centre line, fading as the Sun
+       drifts off-centre, hidden when it's behind us or blocked by a planet */
+    if (flareSprites.length) {
+      const inFrontSun = _v2.copy(byId.sun.wp).sub(camPos).dot(_fwd) > 0;
+      _v1.copy(byId.sun.wp).project(camera);
+      const onScreen = inFrontSun && Math.abs(_v1.x) < 1.5 && Math.abs(_v1.y) < 1.5;
+      const off = Math.hypot(_v1.x, _v1.y);
+      const intensity = onScreen && !occluded ? NZ.clamp(1.15 - off * 0.7, 0, 1) : 0;
+      if (intensity > 0.01) {
+        _right.setFromMatrixColumn(camera.matrixWorld, 0);
+        _up.setFromMatrixColumn(camera.matrixWorld, 1);
+        const D = 30, halfH = D * tanHalf, halfW = halfH * (w / h);
+        for (const f of flareSprites) {
+          f.spr.position.copy(camPos)
+            .addScaledVector(_fwd, D)
+            .addScaledVector(_right, _v1.x * f.t * halfW)
+            .addScaledVector(_up, _v1.y * f.t * halfH);
+          const sz = f.size * halfH * 2;
+          if (f.streak) f.spr.scale.set(sz * 4.5, sz * 0.16, 1);
+          else f.spr.scale.set(sz, sz, 1);
+          f.spr.material.opacity = f.op * intensity;
+          f.spr.visible = true;
+        }
+      } else {
+        for (const f of flareSprites) f.spr.visible = false;
+      }
     }
   }
 
