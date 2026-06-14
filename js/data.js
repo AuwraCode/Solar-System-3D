@@ -547,6 +547,43 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'haumea', name: 'Haumea', kind: 'dwarf', color: 0xe6ebf0,
+      radiusKm: 780, rotH: 3.92, tilt: 0,
+      elements: { a: 43.13, e: 0.195, i: 28.21, O: 121.9, wbar: 0.9, L: 219.1, P: 103774 },
+      rows: [
+        ['Shape', 'Elongated, ~2,100 × 1,160 km'],
+        ['Day', 'just 3.9 hours — one of the fastest big spinners'],
+        ['Year', '284 Earth years'],
+        ['Distance from Sun', '~43 AU'],
+        ['Moons', '2 (Hiʻiaka, Namaka)'],
+        ['Discovered', '2004']
+      ],
+      blurb: 'A dwarf planet spun into a rugby-ball shape by its blistering 4-hour rotation. Haumea even has a thin ring — the first ever found around a body beyond Neptune.',
+      fun: [
+        'It spins so fast it is stretched almost twice as long as it is wide.',
+        'It is the only known dwarf planet with a ring system.',
+        'A giant collision likely created its two moons and an icy family of fragments.'
+      ]
+    },
+    {
+      id: 'makemake', name: 'Makemake', kind: 'dwarf', color: 0xd9a98a,
+      radiusKm: 715, rotH: 22.83, tilt: 0,
+      elements: { a: 45.43, e: 0.159, i: 28.98, O: 79.62, wbar: 16.2, L: 169.9, P: 111845 },
+      rows: [
+        ['Diameter', '~1,430 km'],
+        ['Year', '305 Earth years'],
+        ['Distance from Sun', '~45 AU'],
+        ['Surface', 'Frozen methane and ethane'],
+        ['Discovered', '2005 — nicknamed "Easterbunny"']
+      ],
+      blurb: 'A reddish, methane-frosted dwarf planet of the Kuiper Belt, one of the discoveries that helped end Pluto’s run as the ninth planet.',
+      fun: [
+        'It is named after the creator god of the Rapa Nui people of Easter Island.',
+        'It was found just after Easter 2005, hence its team nickname "Easterbunny".',
+        'Despite its size it has almost no atmosphere, unlike Pluto.'
+      ]
+    },
+    {
       id: 'halley', name: "Halley's Comet", kind: 'comet', color: 0x9fd8ff,
       radiusKm: 5.5, lumpy: true,
       elements: { a: 17.834, e: 0.96714, i: 162.26, O: 58.42, w: 111.33, Tp: 2446470.95, P: 27510 },

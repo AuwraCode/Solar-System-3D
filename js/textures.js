@@ -1111,6 +1111,7 @@ const TEX = (function () {
     oberon: () => genericIce(431, 118, true),
     triton: texTriton, pluto: texPluto, charon: texCharon,
     ceres: texCeres, eris: texEris,
+    haumea: () => genericIce(601, 182, false), makemake: () => genericIce(602, 138, true),
     phobos: texPhobos, deimos: texPhobos, comet: texComet
   };
 
