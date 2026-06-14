@@ -638,6 +638,25 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'sedna', name: 'Sedna', kind: 'dwarf', color: 0xa84a32,
+      radiusKm: 500, rotH: 10.27, tilt: 0,
+      elements: { a: 506, e: 0.8496, i: 11.93, O: 144.25, wbar: 95.65, L: 93.65, P: 4165000 },
+      rows: [
+        ['Diameter', '~1,000 km'],
+        ['Year', '~11,400 Earth years'],
+        ['Distance from Sun', '76–937 AU (extreme orbit)'],
+        ['Surface', 'Among the reddest in the Solar System'],
+        ['Discovered', '2003']
+      ],
+      blurb: 'A frozen world on one of the most elongated orbits known — it spends most of its 11,400-year year in the dark far beyond the Kuiper Belt, in the inner Oort Cloud.',
+      fun: [
+        'Even at its closest it is nearly three times farther than Neptune.',
+        'Its enormous orbit may be a fingerprint of a passing star — or of "Planet Nine".',
+        'It is so cold that nitrogen and methane would fall as snow.',
+        '⏩ Tip: it is near its closest approach now — it won’t be this near again for millennia.'
+      ]
+    },
+    {
       id: 'halley', name: "Halley's Comet", kind: 'comet', color: 0x9fd8ff,
       radiusKm: 5.5, lumpy: true,
       elements: { a: 17.834, e: 0.96714, i: 162.26, O: 58.42, w: 111.33, Tp: 2446470.95, P: 27510 },

@@ -1113,7 +1113,7 @@ const TEX = (function () {
     ceres: texCeres, eris: texEris,
     haumea: () => genericIce(601, 182, false), makemake: () => genericIce(602, 138, true),
     quaoar: () => genericIce(603, 150, true), orcus: () => genericIce(604, 172, false),
-    gonggong: () => genericIce(605, 120, true),
+    gonggong: () => genericIce(605, 120, true), sedna: () => genericIce(606, 108, true),
     phobos: texPhobos, deimos: texPhobos, comet: texComet
   };
 
