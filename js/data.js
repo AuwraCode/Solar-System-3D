@@ -198,7 +198,7 @@ const DATA = (function () {
     },
     {
       id: 'io', name: 'Io', kind: 'moon', parent: 'jupiter', color: 0xe8d06a,
-      radiusKm: 1821.6, sync: true,
+      radiusKm: 1821.6, sync: true, plumes: { type: 'volcano' },
       orbit: { periodD: 1.7691, distF: 2.6, incl: 0.05 },
       rows: [
         ['Diameter', '3,643 km'],
@@ -292,7 +292,7 @@ const DATA = (function () {
     },
     {
       id: 'enceladus', name: 'Enceladus', kind: 'moon', parent: 'saturn', color: 0xe8f4ff,
-      radiusKm: 252.1, sync: true,
+      radiusKm: 252.1, sync: true, plumes: { type: 'geyser' },
       orbit: { periodD: 1.3702, distF: 2.7, incl: 0.02 },
       rows: [
         ['Diameter', '504 km'],

@@ -7,7 +7,7 @@ const SCENE = (function () {
   let sunUniforms, earthUniforms, sunCorona, sunCore;
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
-  let sunProms = [], meteors = [], bhDisks = [];
+  let sunProms = [], meteors = [], bhDisks = [], fountains = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -469,6 +469,96 @@ const SCENE = (function () {
     }
   }
 
+  /* ---------- surface eruptions: Io's volcanoes, Enceladus' geysers ---------- */
+
+  /* A ballistic particle fountain living in the moon's spinning local frame, so
+     its vents stay anchored to the terrain as the moon rotates. Particles shoot
+     radially out of fixed vents, are pulled back toward the centre, and fade. */
+  function makeFountain(host, r, opts) {
+    const n = opts.n;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({
+      size: opts.size, map: TEX.particleTex, transparent: true, depthWrite: false,
+      blending: THREE.AdditiveBlending, vertexColors: true, sizeAttenuation: true
+    }));
+    pts.frustumCulled = false;
+    pts.renderOrder = 4;
+    host.add(pts);
+    const sys = {
+      pts, n, r, vents: opts.vents,
+      pos: geo.attributes.position.array,
+      col: geo.attributes.color.array,
+      vel: new Float32Array(n * 3),
+      age: new Float32Array(n),
+      life: new Float32Array(n),
+      speed: opts.speed, lifeBase: opts.life, grav: opts.grav, spread: opts.spread,
+      hot: new THREE.Color(opts.hot), cool: new THREE.Color(opts.cool)
+    };
+    for (let i = 0; i < n; i++) fountainSpawn(sys, i, Math.random() * sys.lifeBase);
+    return sys;
+  }
+
+  function fountainSpawn(sys, i, age0) {
+    const v = sys.vents[(Math.random() * sys.vents.length) | 0];
+    const j = sys.r * 0.05;
+    const jx = Math.random() - 0.5, jy = Math.random() - 0.5, jz = Math.random() - 0.5;
+    sys.pos[i * 3] = v.x * sys.r + jx * j;
+    sys.pos[i * 3 + 1] = v.y * sys.r + jy * j;
+    sys.pos[i * 3 + 2] = v.z * sys.r + jz * j;
+    const sp = sys.speed * (0.5 + Math.random() * 0.6);
+    sys.vel[i * 3] = v.x * sp + jx * sys.spread * sp;
+    sys.vel[i * 3 + 1] = v.y * sp + jy * sys.spread * sp;
+    sys.vel[i * 3 + 2] = v.z * sp + jz * sys.spread * sp;
+    sys.age[i] = age0;
+    sys.life[i] = sys.lifeBase * (0.6 + Math.random() * 0.8);
+  }
+
+  function fountainStep(sys, dt) {
+    const { pos, vel, age, life, col, n, grav, hot, cool } = sys;
+    for (let i = 0; i < n; i++) {
+      age[i] += dt;
+      if (age[i] >= life[i]) { fountainSpawn(sys, i, 0); continue; }
+      const x = pos[i * 3], y = pos[i * 3 + 1], z = pos[i * 3 + 2];
+      const d = Math.sqrt(x * x + y * y + z * z) || 1e-4;
+      vel[i * 3] -= (x / d) * grav * dt;
+      vel[i * 3 + 1] -= (y / d) * grav * dt;
+      vel[i * 3 + 2] -= (z / d) * grav * dt;
+      pos[i * 3] += vel[i * 3] * dt;
+      pos[i * 3 + 1] += vel[i * 3 + 1] * dt;
+      pos[i * 3 + 2] += vel[i * 3 + 2] * dt;
+      const f = age[i] / life[i], b = 1 - f;
+      col[i * 3] = (hot.r * b + cool.r * f) * b;
+      col[i * 3 + 1] = (hot.g * b + cool.g * f) * b;
+      col[i * 3 + 2] = (hot.b * b + cool.b * f) * b;
+    }
+    sys.pts.geometry.attributes.position.needsUpdate = true;
+    sys.pts.geometry.attributes.color.needsUpdate = true;
+  }
+
+  function buildFountain(rt, mesh, def, seed) {
+    const r = def.dispRad, vents = [];
+    const prng = NZ.mulberry32(def.id.length * 131 + seed);
+    let opts;
+    if (def.plumes.type === 'geyser') {
+      /* clustered around the south pole, like Enceladus' tiger-stripe jets */
+      for (let k = 0; k < 5; k++) {
+        vents.push(new THREE.Vector3().setFromSphericalCoords(1, Math.PI - prng() * 0.55, prng() * 6.2832));
+      }
+      opts = { n: 170, size: r * 0.10, speed: r * 3.6, life: 1.6, grav: r * 8.0,
+        spread: 0.14, hot: 0xeafcff, cool: 0x5fa8ff, vents };
+    } else {
+      /* scattered volcanoes across the whole globe, sulfur-hot */
+      for (let k = 0; k < 4; k++) {
+        vents.push(new THREE.Vector3().setFromSphericalCoords(1, Math.acos(2 * prng() - 1), prng() * 6.2832));
+      }
+      opts = { n: 200, size: r * 0.085, speed: r * 3.0, life: 1.3, grav: r * 9.0,
+        spread: 0.12, hot: 0xffd884, cool: 0xc62a08, vents };
+    }
+    fountains.push({ rt, sys: makeFountain(mesh, r, opts) });
+  }
+
   /* ---------- build ---------- */
 
   async function build(scene, renderer, camera, progress) {
@@ -742,6 +832,7 @@ const SCENE = (function () {
       rt.orbG = orbG;
       rt.orbitR = parentRt.dispRad * def.orbit.distF;
       rt.spinMesh = mesh;
+      if (def.plumes) buildFountain(rt, mesh, def, mi);
       parentRt.sysR = Math.max(parentRt.sysR, rt.orbitR);
       const circle = moonCircle(rt.orbitR, def.color, 0.22);
       orbG.add(circle);
@@ -1215,6 +1306,14 @@ const SCENE = (function () {
        their dirty flags */
     root.updateMatrixWorld();
     for (const b of bodies) if (!b.fixed) b.wp.setFromMatrixPosition(b.group.matrixWorld);
+
+    /* surface eruptions: only stir the particles when the camera is close enough
+       to actually see them (they're tiny specks from across a planet's system) */
+    for (const f of fountains) {
+      const close = camRef.position.distanceTo(f.rt.wp) < Math.max(8, f.rt.dispRad * 90);
+      f.sys.pts.visible = close;
+      if (close) fountainStep(f.sys, dtReal);
+    }
   }
 
   /* ---------- view-dependent: markers, labels, fades ---------- */
