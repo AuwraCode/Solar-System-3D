@@ -1557,6 +1557,46 @@ const DATA = (function () {
       blurb: 'A blue-white star forming the other wing of the Swan, also called Delta Cygni.',
       fun: ['In about 11,000 years it will become the northern pole star.']
     },
+    {
+      id: 'shaula', name: 'Shaula', kind: 'star', color: 0xbcd4ff,
+      star: { ra: 263.402, dec: -37.104, mag: 1.62, spect: '#bcd4ff' },
+      rows: [['Constellation', 'Scorpius (the stinger)'], ['Distance', '~570 light-years'],
+        ['Type', 'B2 blue subgiant'], ['Apparent magnitude', '1.62']],
+      blurb: 'The bright blue star at the tip of the Scorpion’s curved tail — its venomous stinger.',
+      fun: ['Its name is Arabic for "the raised tail".', 'It is the second-brightest star of Scorpius after Antares.']
+    },
+    {
+      id: 'sargas', name: 'Sargas', kind: 'star', color: 0xfff4e8,
+      star: { ra: 264.330, dec: -42.998, mag: 1.86, spect: '#fff4e8' },
+      rows: [['Constellation', 'Scorpius (tail)'], ['Distance', '~270 light-years'],
+        ['Type', 'F1 yellow-white giant'], ['Apparent magnitude', '1.86']],
+      blurb: 'A luminous giant in the Scorpion’s tail, beside Shaula at the stinger’s base.',
+      fun: ['Its name is of ancient Sumerian origin.', 'It is around 1,800 times more luminous than the Sun.']
+    },
+    {
+      id: 'dschubba', name: 'Dschubba', kind: 'star', color: 0xaabfff,
+      star: { ra: 240.083, dec: -22.622, mag: 2.29, spect: '#aabfff' },
+      rows: [['Constellation', 'Scorpius (head)'], ['Distance', '~400 light-years'],
+        ['Type', 'B0 blue, eruptive'], ['Apparent magnitude', '2.29 (variable)']],
+      blurb: 'The middle star in the row that forms the Scorpion’s head, a hot blue star that occasionally flares.',
+      fun: ['Its name is Arabic for "the forehead".', 'In 2000 it suddenly brightened as it shed a disk of gas.']
+    },
+    {
+      id: 'larawag', name: 'Larawag', kind: 'star', color: 0xffd2a1,
+      star: { ra: 252.541, dec: -34.293, mag: 2.29, spect: '#ffd2a1' },
+      rows: [['Constellation', 'Scorpius (body)'], ['Distance', '~65 light-years'],
+        ['Type', 'K1 orange giant'], ['Apparent magnitude', '2.29']],
+      blurb: 'An orange giant along the bend of the Scorpion’s body, between Antares and the tail.',
+      fun: ['Also known as Epsilon Scorpii.', 'Its name comes from the Boorong people of Australia.']
+    },
+    {
+      id: 'piscorpii', name: 'Fang', kind: 'star', color: 0xaec4ff,
+      star: { ra: 239.713, dec: -26.114, mag: 2.89, spect: '#aec4ff' },
+      rows: [['Constellation', 'Scorpius (head)'], ['Distance', '~590 light-years'],
+        ['Type', 'B1 blue'], ['Apparent magnitude', '2.89']],
+      blurb: 'A blue star forming one of the Scorpion’s claws, beside Dschubba in the head.',
+      fun: ['Also called Pi Scorpii — its formal name is Fang.', 'It is a close binary of two hot blue stars.']
+    },
 
     /* ---- black holes ---- */
     {
@@ -1687,6 +1727,10 @@ const DATA = (function () {
     ] },
     { name: 'Cygnus', pairs: [
       ['deneb', 'sadr'], ['sadr', 'albireo'], ['sadr', 'gienah_cyg'], ['sadr', 'fawaris']
+    ] },
+    { name: 'Scorpius', pairs: [
+      ['piscorpii', 'dschubba'], ['dschubba', 'antares'], ['piscorpii', 'antares'],
+      ['antares', 'larawag'], ['larawag', 'shaula'], ['shaula', 'sargas']
     ] }
   ];
 
