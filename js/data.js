@@ -745,6 +745,40 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'swifttuttle', name: '109P/Swift–Tuttle', kind: 'comet', color: 0x9fd8ff,
+      radiusKm: 13, lumpy: true,
+      elements: { a: 26.092, e: 0.963, i: 113.45, O: 139.38, w: 152.98, Tp: 2448968.5, P: 48710 },
+      rows: [
+        ['Nucleus', '~26 km'],
+        ['Orbital period', '133 years'],
+        ['Last perihelion', 'December 1992'],
+        ['Debris shower', 'the Perseids, every August']
+      ],
+      blurb: 'The parent of the Perseid meteor shower. Each August, Earth ploughs through the dust this comet has shed, lighting up the sky with shooting stars.',
+      fun: [
+        'Its nucleus is larger than the object thought to have killed the dinosaurs.',
+        'It will pass unusually close to Earth in the year 4479.',
+        'The Perseids have been observed for about 2,000 years.'
+      ]
+    },
+    {
+      id: 'tempeltuttle', name: '55P/Tempel–Tuttle', kind: 'comet', color: 0x9fd8ff,
+      radiusKm: 1.8, lumpy: true,
+      elements: { a: 10.337, e: 0.906, i: 162.49, O: 235.27, w: 172.5, Tp: 2450872.5, P: 12130 },
+      rows: [
+        ['Nucleus', '~3.6 km'],
+        ['Orbital period', '33 years'],
+        ['Last perihelion', 'February 1998'],
+        ['Debris shower', 'the Leonids, every November']
+      ],
+      blurb: 'The parent of the Leonid meteor shower, which roughly every 33 years erupts into a dazzling meteor storm of thousands of shooting stars per hour.',
+      fun: [
+        'The 1833 Leonid storm dropped an estimated 100,000+ meteors per hour.',
+        'That storm helped found the modern scientific study of meteors.',
+        'Its next return to the inner Solar System is around 2031.'
+      ]
+    },
+    {
       id: 'iss', name: 'International Space Station', kind: 'craft', parent: 'earth', color: 0xffd166,
       craft: 'iss',
       orbit: { periodD: 0.0645, distF: 1.45, incl: 51.6 },
