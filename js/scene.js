@@ -9,6 +9,7 @@ const SCENE = (function () {
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
   let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [], auroraRings = [], pulsars = [];
+  let trojans = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -1084,6 +1085,34 @@ const SCENE = (function () {
     }));
     scene.add(kuiperPts);
 
+    /* Jupiter Trojans — two swarms of asteroids that ride 60° ahead of and
+       behind Jupiter at its L4/L5 Lagrange points, locked to its orbit */
+    {
+      const RJ = DATA.byId.jupiter.elements.a * DATA.AU;
+      const trng = NZ.mulberry32(1212);
+      for (const lead of [1, -1]) {
+        const TN = 650;
+        const tpos = new Float32Array(TN * 3);
+        for (let i = 0; i < TN; i++) {
+          const ang = (trng() - 0.5) * 0.66;                 /* libration spread along the orbit */
+          const rr = RJ * (1 + (trng() - 0.5) * 0.13);
+          const yy = (trng() + trng() + trng() - 1.5) * 0.55 * DATA.AU;
+          tpos[i * 3] = Math.cos(ang) * rr;                  /* built around +X; group carries it to L4/L5 */
+          tpos[i * 3 + 1] = yy;
+          tpos[i * 3 + 2] = -Math.sin(ang) * rr;
+        }
+        const tgeo = new THREE.BufferGeometry();
+        tgeo.setAttribute('position', new THREE.BufferAttribute(tpos, 3));
+        const tpts = new THREE.Points(tgeo, new THREE.PointsMaterial({
+          color: 0x9a8d7c, size: 2.0, sizeAttenuation: false, map: TEX.markerTex,
+          transparent: true, opacity: 0.7, depthWrite: false
+        }));
+        tpts.frustumCulled = false;
+        scene.add(tpts);
+        trojans.push({ pts: tpts, lead });
+      }
+    }
+
     /* region pseudo-bodies */
     for (const def of DATA.bodies.filter(d => d.kind === 'region')) {
       const group = new THREE.Group();
@@ -1447,6 +1476,13 @@ const SCENE = (function () {
       }
       beltMesh.instanceMatrix.needsUpdate = true;
       kuiperPts.rotation.y = simDays * 2 * Math.PI / (365.25 * 270);
+    }
+
+    /* keep the Trojan swarms pinned 60° ahead of and behind Jupiter */
+    if (trojans.length) {
+      const jp = byId.jupiter.group.position;
+      const thetaJ = Math.atan2(-jp.z, jp.x);
+      for (const t of trojans) t.pts.rotation.y = thetaJ + t.lead * Math.PI / 3;
     }
 
     /* cache world positions — non-forced so the frozen static subtrees (galaxies,
