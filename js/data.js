@@ -1705,6 +1705,39 @@ const DATA = (function () {
         'Its filaments are still rushing outward at about 1,500 km/s.',
         'It was the very first object in Charles Messier’s famous catalogue (M1).'
       ]
+    },
+    {
+      id: 'crabpulsar', name: 'Crab Pulsar', kind: 'pulsar', color: 0xcfe6ff,
+      dispRad: 70, pulsar: { ra: 83.63, dec: 22.01, dist: 6650, rate: 9.0, tilt: 38, beam: '#d0f0ff' },
+      rows: [
+        ['Type', 'Neutron star (pulsar)'],
+        ['Spin', '~30 times every second'],
+        ['Diameter', '~28 km — a city-sized star'],
+        ['Mass', '~1.4 Suns crushed into that ball'],
+        ['Born', 'the supernova of AD 1054']
+      ],
+      blurb: 'At the heart of the Crab Nebula spins the collapsed core of the exploded star: a neutron star so dense a sugar-cube of it would weigh a billion tonnes, sweeping lighthouse beams across the galaxy 30 times a second.',
+      fun: [
+        'A teaspoon of neutron-star matter weighs about as much as a mountain.',
+        'Its beams sweep past Earth so regularly it was once mistaken for an alien signal.',
+        'It powers the entire Crab Nebula’s eerie blue glow.'
+      ]
+    },
+    {
+      id: 'velapulsar', name: 'Vela Pulsar', kind: 'pulsar', color: 0xbfe0ff,
+      dispRad: 60, pulsar: { ra: 128.84, dec: -45.18, dist: 5200, rate: 11.0, tilt: 25, beam: '#cfe6ff' },
+      rows: [
+        ['Type', 'Neutron star (pulsar)'],
+        ['Spin', '~11 times every second'],
+        ['Distance', '~960 light-years'],
+        ['Born', 'a supernova ~11,000 years ago']
+      ],
+      blurb: 'One of the brightest pulsars in the sky, the still-spinning ember of a supernova that lit Earth’s skies during the last Ice Age.',
+      fun: [
+        'It occasionally "glitches" — abruptly spinning faster as its crust cracks.',
+        'It was the first pulsar firmly linked to a supernova remnant.',
+        'Its gamma-ray beam is one of the brightest in the whole sky.'
+      ]
     }
   ];
 

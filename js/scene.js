@@ -8,7 +8,7 @@ const SCENE = (function () {
   let ringShadow = null;       // Saturn's shadow cast across its rings
   let beltMesh, beltData, kuiperPts;
   let lastBeltDays = NaN;      // sim-day stamp of the last belt rebuild
-  let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [], auroraRings = [];
+  let sunProms = [], meteors = [], bhDisks = [], fountains = [], flareSprites = [], auroraRings = [], pulsars = [];
   const starTwinkle = { value: 0 };
   const comets = [];
   let raycaster = null;
@@ -327,7 +327,7 @@ const SCENE = (function () {
       visible: true,
       /* deep-sky objects are pinned to the sky and never move — their world
          position is cached once and skipped by the per-frame update */
-      fixed: def.kind === 'galaxy' || def.kind === 'nebula' ||
+      fixed: def.kind === 'galaxy' || def.kind === 'nebula' || def.kind === 'pulsar' ||
         def.kind === 'blackhole' || def.kind === 'region' ||
         (def.kind === 'star' && def.id !== 'sun')
     };
@@ -1233,6 +1233,41 @@ const SCENE = (function () {
       staticObjs.push(group);
     }
 
+    /* pulsars — neutron stars sweeping twin lighthouse beams as they spin */
+    for (const def of DATA.bodies.filter(d => d.kind === 'pulsar')) {
+      const p = def.pulsar, R = def.dispRad;
+      const group = new THREE.Group();
+      group.position.copy(ORB.eclDir(p.ra, p.dec)).multiplyScalar(p.dist);
+      const spin = new THREE.Group();
+      /* bright neutron-star core */
+      const core = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: TEX.spriteGlow('rgba(255,255,255,1)', 'rgba(180,220,255,0.4)'),
+        color: new THREE.Color(p.beam || '#cfe6ff'), transparent: true, opacity: 0.95,
+        depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending
+      }));
+      core.scale.set(R * 1.1, R * 1.1, 1);
+      spin.add(core);
+      /* twin beams along the magnetic axis, tilted off the spin axis */
+      const beamGeo = new THREE.ConeGeometry(R * 0.5, R * 9, 20, 1, true);
+      beamGeo.translate(0, -R * 4.5, 0);   /* apex at the core, opening outward (-y) */
+      const beamMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(p.beam || '#cfe6ff'), transparent: true, opacity: 0.25,
+        side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+      });
+      const axis = new THREE.Group();
+      const beamA = new THREE.Mesh(beamGeo, beamMat);
+      const beamB = new THREE.Mesh(beamGeo, beamMat); beamB.rotation.x = Math.PI;
+      axis.add(beamA, beamB);
+      axis.rotation.z = THREE.MathUtils.degToRad(p.tilt || 30);
+      spin.add(axis);
+      group.add(spin);
+      scene.add(group);
+      const rt = registerBody(def, group, null, null);
+      hitSphere(rt, R);
+      pulsars.push({ spin, rate: p.rate || 8 });
+      staticLocal.push(group);   /* fixed in the sky; the spin group animates */
+    }
+
     /* freeze the static set: bake their world matrices once and stop them from
        being touched by every frame's scene-graph traversal */
     for (const o of staticObjs) {
@@ -1355,6 +1390,7 @@ const SCENE = (function () {
     }
     starTwinkle.value = sunT;
     for (const a of auroraRings) a.mat.opacity = a.base * (0.62 + 0.38 * Math.sin(sunT * 1.3 + a.phase));
+    for (const p of pulsars) p.spin.rotation.y += p.rate * dtReal;
     for (const u of bhDisks) u.uTime.value = sunT;
     updateMeteors(dtReal);
 
@@ -1486,7 +1522,8 @@ const SCENE = (function () {
         let op = NZ.clamp((11 - meshPx) / 8, 0, 1) * 0.85;
         if (!sysVis) op = 0;
         if (b.def.kind === 'star' || b.def.kind === 'galaxy'
-          || b.def.kind === 'blackhole' || b.def.kind === 'nebula') op = 0;
+          || b.def.kind === 'blackhole' || b.def.kind === 'nebula'
+          || b.def.kind === 'pulsar') op = 0;
         b.marker.material.opacity = op;
         b.marker.visible = op > 0.02;
       }
