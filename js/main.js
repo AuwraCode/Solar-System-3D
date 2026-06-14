@@ -146,6 +146,11 @@
         } else overview();
       }
       else if (k >= '0' && k <= '9') select(planetKeys[+k]);
+      else if (k === 'r') {
+        const pool = SCENE.bodies.filter(b => b.def.kind !== 'region' && b.def.id !== 'sun');
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        if (pick) { select(pick); UI.toast('🎲 Surprise! Flying to ' + pick.def.name + '.'); }
+      }
       else if (k === 'f') {
         if (rig.mode === 'fly') {
           rig.exitFly(rig.nearestBody(SCENE.bodies));
