@@ -799,7 +799,7 @@ const SCENE = (function () {
         const tex = TEX.registry[def.id] ? TEX.registry[def.id]() : null;
         mesh = new THREE.Mesh(
           new THREE.SphereGeometry(def.dispRad, def.kind === 'planet' ? 56 : 40, def.kind === 'planet' ? 40 : 28),
-          new THREE.MeshLambertMaterial({ map: tex })
+          new THREE.MeshLambertMaterial(tex ? { map: tex } : { color: def.color })
         );
       }
       tiltG.add(mesh);
@@ -888,7 +888,7 @@ const SCENE = (function () {
       } else {
         const tex = TEX.registry[def.id] ? TEX.registry[def.id]() : null;
         mesh = new THREE.Mesh(new THREE.SphereGeometry(def.dispRad, 36, 26),
-          new THREE.MeshLambertMaterial({ map: tex }));
+          new THREE.MeshLambertMaterial(tex ? { map: tex } : { color: def.color }));
       }
       group.add(mesh);
       if (def.atmo) group.add(makeAtmo(def.dispRad, def.atmo));
