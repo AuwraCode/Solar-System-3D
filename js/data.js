@@ -1413,6 +1413,46 @@ const DATA = (function () {
       fun: ['Its name comes from Arabic for "leader of the mourners".',
         'Unlike the bowl stars, it does not share the Dipper’s common motion.']
     },
+    {
+      id: 'schedar', name: 'Schedar', kind: 'star', color: 0xffd2a1,
+      star: { ra: 10.127, dec: 56.537, mag: 2.24, spect: '#ffd2a1' },
+      rows: [['Constellation', 'Cassiopeia'], ['Distance', '~228 light-years'],
+        ['Type', 'K0 orange giant'], ['Apparent magnitude', '2.24']],
+      blurb: 'The brightest star of Cassiopeia, an orange giant marking one corner of the sky’s great "W".',
+      fun: ['Its name is Arabic for "the breast" of the queen.', 'It is about 45 times the diameter of the Sun.']
+    },
+    {
+      id: 'caph', name: 'Caph', kind: 'star', color: 0xfff4e8,
+      star: { ra: 2.295, dec: 59.150, mag: 2.28, spect: '#fff4e8' },
+      rows: [['Constellation', 'Cassiopeia'], ['Distance', '~54 light-years'],
+        ['Type', 'F2 yellow-white'], ['Apparent magnitude', '2.28']],
+      blurb: 'One tip of Cassiopeia’s "W", a yellow-white star that pulses subtly as it ages.',
+      fun: ['It lies almost exactly on the prime hour circle of the sky.', 'It is a fast rotator, slightly flattened by its spin.']
+    },
+    {
+      id: 'navi', name: 'Navi', kind: 'star', color: 0xaabfff,
+      star: { ra: 14.177, dec: 60.717, mag: 2.47, spect: '#aabfff' },
+      rows: [['Constellation', 'Cassiopeia (centre)'], ['Distance', '~550 light-years'],
+        ['Type', 'B0 blue, eruptive variable'], ['Apparent magnitude', '1.6–3.0 (variable)']],
+      blurb: 'The unstable blue heart of the "W" — a shell star that flings off rings of gas and flares unpredictably.',
+      fun: ['Astronaut Gus Grissom nicknamed it "Navi" (his middle name Ivan, reversed).', 'It was the first star found to show emission lines, in 1866.']
+    },
+    {
+      id: 'ruchbah', name: 'Ruchbah', kind: 'star', color: 0xeaf0ff,
+      star: { ra: 21.454, dec: 60.235, mag: 2.68, spect: '#eaf0ff' },
+      rows: [['Constellation', 'Cassiopeia'], ['Distance', '~99 light-years'],
+        ['Type', 'A5 white'], ['Apparent magnitude', '2.68']],
+      blurb: 'A white star forming one of the inner bends of Cassiopeia’s "W".',
+      fun: ['Its name is Arabic for "the knee".', 'It is a slow eclipsing binary, dipping every 759 days.']
+    },
+    {
+      id: 'segin', name: 'Segin', kind: 'star', color: 0xbcd0ff,
+      star: { ra: 28.599, dec: 63.670, mag: 3.38, spect: '#bcd0ff' },
+      rows: [['Constellation', 'Cassiopeia'], ['Distance', '~410 light-years'],
+        ['Type', 'B3 blue giant'], ['Apparent magnitude', '3.38']],
+      blurb: 'The faint blue star at one end of the "W", closing off the constellation Cassiopeia.',
+      fun: ['It is a hot, luminous giant burning through its fuel quickly.']
+    },
 
     /* ---- black holes ---- */
     {
@@ -1530,6 +1570,9 @@ const DATA = (function () {
     { name: 'Big Dipper', pairs: [
       ['alkaid', 'mizar'], ['mizar', 'alioth'], ['alioth', 'megrez'], ['megrez', 'phecda'],
       ['phecda', 'merak'], ['merak', 'dubhe'], ['dubhe', 'megrez']
+    ] },
+    { name: 'Cassiopeia', pairs: [
+      ['caph', 'schedar'], ['schedar', 'navi'], ['navi', 'ruchbah'], ['ruchbah', 'segin']
     ] }
   ];
 
