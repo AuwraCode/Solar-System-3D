@@ -138,6 +138,45 @@ const UI = (function () {
   function openSizes() { $('sizeCompare').classList.add('open'); }
   function closeSizes() { $('sizeCompare').classList.remove('open'); }
 
+  /* ---------- measure distance ---------- */
+
+  function buildMeasure() {
+    const groups = [
+      ['Sun & planets', d => d.id === 'sun' || d.kind === 'planet'],
+      ['Dwarf planets', d => d.kind === 'dwarf'],
+      ['Moons', d => d.kind === 'moon'],
+      ['Spacecraft', d => d.kind === 'craft'],
+      ['Comets', d => d.kind === 'comet']
+    ];
+    const opts = groups.map(([title, filt]) => {
+      const rows = DATA.bodies.filter(filt)
+        .map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+      return rows ? `<optgroup label="${title}">${rows}</optgroup>` : '';
+    }).join('');
+    $('measA').innerHTML = opts;
+    $('measB').innerHTML = opts;
+    $('measA').value = 'earth';
+    $('measB').value = 'mars';
+    const apply = () => hooks.setMeasure($('measA').value, $('measB').value);
+    $('measA').addEventListener('change', apply);
+    $('measB').addEventListener('change', apply);
+  }
+
+  function toggleMeasure() {
+    const m = $('measure');
+    const open = m.classList.toggle('open');
+    if (open) hooks.setMeasure($('measA').value, $('measB').value);
+    else { hooks.setMeasure(null, null); $('measReadout').textContent = ''; }
+  }
+
+  function updateMeasureReadout(info) {
+    if (!$('measure').classList.contains('open')) return;
+    const el = $('measReadout');
+    if (!info) { el.textContent = ''; return; }
+    const au = info.au < 0.01 ? info.au.toFixed(5) : info.au.toFixed(info.au < 10 ? 3 : 2);
+    el.innerHTML = `<b>${info.a} → ${info.b}</b><br>${info.km}<br>${au} AU · ${info.light}`;
+  }
+
   function toggleDrawer(open) {
     const d = $('drawer');
     const want = open === undefined ? !d.classList.contains('open') : open;
@@ -212,6 +251,8 @@ const UI = (function () {
     buildSizes();
     $('btnSizes').addEventListener('click', openSizes);
     $('btnCloseSizes').addEventListener('click', closeSizes);
+    buildMeasure();
+    $('btnMeasure').addEventListener('click', toggleMeasure);
 
     $('btnNav').addEventListener('click', () => toggleDrawer());
     $('btnCloseDrawer').addEventListener('click', () => toggleDrawer(false));
@@ -247,7 +288,7 @@ const UI = (function () {
 
   return {
     init, tick, showInfo, hideInfo, setLive, toast, setBreadcrumb,
-    startTour, stopTour, tourRunning, openSizes,
+    startTour, stopTour, tourRunning, openSizes, updateMeasureReadout,
     setSpeedIdx, get paused() { return paused; },
     speeds: SPEEDS
   };

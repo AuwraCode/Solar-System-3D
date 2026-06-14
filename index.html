@@ -23,6 +23,7 @@
   </div>
   <button id="btnLayers" title="Show / hide layers">⧉ Layers</button>
   <button id="btnSizes" title="Compare sizes to scale">⚖ Sizes</button>
+  <button id="btnMeasure" title="Measure the distance between two bodies">📏 Measure</button>
   <button id="btnOverview" title="Full system view (Esc)">⌂</button>
   <button id="btnHelp" title="Help (H)">?</button>
 </div>
@@ -37,6 +38,16 @@
   <label><input type="checkbox" data-layer="craft" checked> Spacecraft</label>
   <label><input type="checkbox" data-layer="stars" checked> Stars &amp; constellations</label>
   <label><input type="checkbox" data-layer="deepsky" checked> Galaxies, nebulae &amp; more</label>
+</div>
+
+<div id="measure">
+  <div class="layers-title">Measure distance</div>
+  <div class="meas-pickers">
+    <select id="measA"></select>
+    <span class="meas-arrow">→</span>
+    <select id="measB"></select>
+  </div>
+  <div id="measReadout" class="meas-readout"></div>
 </div>
 
 <div id="drawer">

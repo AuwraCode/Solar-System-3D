@@ -1345,6 +1345,72 @@ const SCENE = (function () {
     if (cat === 'stars') for (const l of constellationLines) l.visible = on;
   }
 
+  /* ---------- measure distance between two bodies ---------- */
+
+  let measA = null, measB = null, measLine = null, measLabel = null;
+
+  function fmtKm(km) {
+    if (km >= 1e9) return (km / 1e9).toFixed(2) + ' billion km';
+    if (km >= 1e6) return (km / 1e6).toFixed(1) + ' million km';
+    return Math.round(km).toLocaleString('en-US') + ' km';
+  }
+  function fmtLight(s) {
+    if (s < 1) return (s * 1000).toFixed(0) + ' light-ms';
+    if (s < 60) return s.toFixed(1) + ' light-seconds';
+    if (s < 3600) return (s / 60).toFixed(1) + ' light-minutes';
+    if (s < 86400) return (s / 3600).toFixed(2) + ' light-hours';
+    if (s < 31557600) return (s / 86400).toFixed(2) + ' light-days';
+    return (s / 31557600).toFixed(2) + ' light-years';
+  }
+
+  function setMeasure(idA, idB) {
+    measA = byId[idA] || null;
+    measB = byId[idB] || null;
+    const on = !!(measA && measB && measA !== measB);
+    if (on && !measLine) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+      measLine = new THREE.Line(geo, new THREE.LineDashedMaterial({
+        color: 0x8effd0, transparent: true, opacity: 0.95, depthWrite: false, depthTest: false,
+        dashSize: 6, gapSize: 4
+      }));
+      measLine.renderOrder = 8;
+      measLine.frustumCulled = false;
+      root.add(measLine);
+      measLabel = document.createElement('div');
+      measLabel.className = 'label measure-label';
+      labelBox.appendChild(measLabel);
+    }
+    if (measLine) measLine.visible = on;
+    if (measLabel) measLabel.style.display = on ? 'block' : 'none';
+  }
+
+  function measureInfo() {
+    if (!measLine || !measLine.visible) return null;
+    const au = measA.wp.distanceTo(measB.wp) / DATA.AU;
+    return { a: measA.def.name, b: measB.def.name, au,
+      km: fmtKm(au * 149597870.7), light: fmtLight(au * 499.004784) };
+  }
+
+  function updateMeasure(camera, w, h) {
+    if (!measLine || !measLine.visible) return;
+    const a = measA.wp, b = measB.wp;
+    const arr = measLine.geometry.attributes.position.array;
+    arr[0] = a.x; arr[1] = a.y; arr[2] = a.z;
+    arr[3] = b.x; arr[4] = b.y; arr[5] = b.z;
+    measLine.geometry.attributes.position.needsUpdate = true;
+    measLine.computeLineDistances();
+    const au = a.distanceTo(b) / DATA.AU;
+    _v1.copy(a).add(b).multiplyScalar(0.5).project(camera);
+    if (_v1.z < 1 && _v1.x > -1.1 && _v1.x < 1.1 && _v1.y > -1.1 && _v1.y < 1.1) {
+      measLabel.style.display = 'block';
+      measLabel.textContent = (au < 0.01 ? (au * 149597870.7).toFixed(0) + ' km' : au.toFixed(au < 10 ? 3 : 1) + ' AU') + '  ·  ' + fmtLight(au * 499.004784);
+      measLabel.style.transform = `translate(-50%,-50%) translate(${((_v1.x * 0.5 + 0.5) * w).toFixed(1)}px,${((-_v1.y * 0.5 + 0.5) * h).toFixed(1)}px)`;
+    } else {
+      measLabel.style.display = 'none';
+    }
+  }
+
   /* ---------- per-frame ---------- */
 
   const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3();
@@ -1677,6 +1743,8 @@ const SCENE = (function () {
         for (const f of flareSprites) f.spr.visible = false;
       }
     }
+
+    updateMeasure(camera, w, h);
   }
 
   /* screen-space pick fallback: nearest labelled body within px radius */
@@ -1719,6 +1787,7 @@ const SCENE = (function () {
 
   return {
     build, update, updateView, screenPick, raycastPick, setVisible,
+    setMeasure, measureInfo,
     bodies, byId,
     onSelect: null
   };

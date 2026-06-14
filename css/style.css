@@ -331,6 +331,42 @@ button.active { background: rgba(50, 90, 160, 0.65); border-color: var(--accent)
   #cornerRight { display: none; }
 }
 
+/* ---------- measure panel ---------- */
+
+#measure {
+  position: fixed; top: 52px; right: 14px;
+  z-index: 12;
+  display: none;
+  flex-direction: column; gap: 8px;
+  width: 260px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+#measure.open { display: flex; }
+.meas-pickers { display: flex; align-items: center; gap: 6px; }
+.meas-arrow { color: var(--accent); }
+#measure select {
+  flex: 1; min-width: 0;
+  font: inherit; font-size: 12px; color: var(--txt);
+  background: rgba(20, 28, 46, 0.9);
+  border: 1px solid var(--panel-border);
+  border-radius: 7px; padding: 5px 6px; outline: none;
+}
+#measure select:focus { border-color: var(--accent); }
+.meas-readout { font-size: 12px; color: #9fd8ff; line-height: 1.6; min-height: 16px; }
+.meas-readout b { color: #eaf2ff; }
+.measure-label {
+  display: none;
+  background: rgba(10, 30, 26, 0.85);
+  border-color: rgba(140, 255, 208, 0.4);
+  color: #c8ffe8;
+  font-size: 11px;
+}
+
 /* ---------- size comparison ---------- */
 
 #sizeCompare {
@@ -403,7 +439,8 @@ body.cinema #cornerRight,
 body.cinema #disclaimer,
 body.cinema #infoPanel,
 body.cinema #drawer,
-body.cinema #layers {
+body.cinema #layers,
+body.cinema #measure {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;

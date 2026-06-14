@@ -213,6 +213,7 @@
       } else if (b && b.def.kind === 'craft') {
         UI.setLive('');
       }
+      UI.updateMeasureReadout(SCENE.measureInfo());
     }
 
     renderer.render(scene, camera);
@@ -253,7 +254,8 @@
       setLabels: v => { STATE.showLabels = v; },
       setOrbits: v => { STATE.showOrbits = v; },
       setDrift: v => { rig.autoDrift = v; },
-      setLayer: (cat, on) => SCENE.setVisible(cat, on)
+      setLayer: (cat, on) => SCENE.setVisible(cat, on),
+      setMeasure: (a, b) => SCENE.setMeasure(a, b)
     });
 
     setupPicking();
