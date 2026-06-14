@@ -869,6 +869,39 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'pioneer10', name: 'Pioneer 10', kind: 'craft', color: 0xffd166,
+      craft: 'probe', ray: { lon: 72.0, lat: 3.0, r0: 137.0, rate: 2.54, jd0: 2461200 },
+      rows: [
+        ['Launched', '2 March 1972'],
+        ['First', 'first craft through the asteroid belt and past Jupiter'],
+        ['Distance', '~137 AU, heading toward Aldebaran'],
+        ['Last contact', '23 January 2003'],
+        ['Power', 'silent — its RTG finally faded']
+      ],
+      blurb: 'The trailblazer: the first spacecraft to cross the asteroid belt and visit Jupiter, and the first put on a path to leave the Solar System entirely.',
+      fun: [
+        'It carries the famous Pioneer plaque showing a man, a woman and our location.',
+        'In about 2 million years it will drift past the bright star Aldebaran.',
+        'It returned the first close-up images of Jupiter in 1973.'
+      ]
+    },
+    {
+      id: 'pioneer11', name: 'Pioneer 11', kind: 'craft', color: 0xffd166,
+      craft: 'probe', ray: { lon: 295.0, lat: 18.0, r0: 116.0, rate: 2.32, jd0: 2461200 },
+      rows: [
+        ['Launched', '6 April 1973'],
+        ['First', 'first craft to fly past Saturn'],
+        ['Distance', '~116 AU, heading toward Aquila'],
+        ['Last contact', 'November 1995']
+      ],
+      blurb: 'Pioneer 10’s twin and the first visitor to Saturn, scouting the path and the rings that the Voyagers would later study in detail.',
+      fun: [
+        'It used Jupiter’s gravity to slingshot across the Solar System to Saturn.',
+        'It discovered Saturn’s F ring — nearly crashing into it on the way through.',
+        'It too carries a Pioneer plaque for any future finders.'
+      ]
+    },
+    {
       id: 'belt', name: 'Asteroid Belt', kind: 'region', color: 0x8a8478,
       view: { pos: [2.7, 0.18, 0.4], dist: 130 },
       rows: [
