@@ -711,6 +711,40 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'halebopp', name: 'Comet Hale–Bopp', kind: 'comet', color: 0x9fd8ff,
+      radiusKm: 30, lumpy: true,
+      elements: { a: 186, e: 0.995086, i: 89.43, O: 282.47, w: 130.59, Tp: 2450538.2, P: 924900 },
+      rows: [
+        ['Nucleus', '~60 km — exceptionally large'],
+        ['Orbital period', '~2,530 years'],
+        ['Last perihelion', '1 April 1997'],
+        ['Visible to eye', 'a record ~18 months']
+      ],
+      blurb: 'The Great Comet of 1997 — one of the brightest of the 20th century, hanging in the sky for a year and a half with two brilliant tails of dust and ion gas.',
+      fun: [
+        'Its huge nucleus let it blaze even though it never came closer than Earth’s distance from the Sun.',
+        'It showed a rare third, sodium tail.',
+        '⏪ Tip: rewind to 1997 to watch it round the Sun and flare up.'
+      ]
+    },
+    {
+      id: 'neowise', name: 'Comet NEOWISE', kind: 'comet', color: 0x9fd8ff,
+      radiusKm: 2.5, lumpy: true,
+      elements: { a: 358.5, e: 0.99921, i: 128.94, O: 61.0, w: 37.28, Tp: 2459034.0, P: 2480000 },
+      rows: [
+        ['Nucleus', '~5 km'],
+        ['Orbital period', '~6,800 years'],
+        ['Last perihelion', '3 July 2020'],
+        ['Discovered', 'March 2020, by the NEOWISE space telescope']
+      ],
+      blurb: 'The brightest comet visible from the Northern Hemisphere since 1997, gracing the dawn and dusk skies of July 2020 with a long golden dust tail.',
+      fun: [
+        'It survived a close swing past the Sun that destroys many comets.',
+        'It was found by an infrared space telescope hunting near-Earth objects.',
+        'It will not return for nearly 7,000 years.'
+      ]
+    },
+    {
       id: 'iss', name: 'International Space Station', kind: 'craft', parent: 'earth', color: 0xffd166,
       craft: 'iss',
       orbit: { periodD: 0.0645, distF: 1.45, incl: 51.6 },
