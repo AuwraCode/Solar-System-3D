@@ -444,6 +444,36 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'ariel', name: 'Ariel', kind: 'moon', parent: 'uranus', color: 0xcdd2d6,
+      radiusKm: 578.9, sync: true,
+      orbit: { periodD: 2.520, distF: 2.9, incl: 0.26 },
+      rows: [
+        ['Diameter', '1,158 km'],
+        ['Surface', 'the youngest, brightest of Uranus’s moons'],
+        ['Orbital period', '2.52 days']
+      ],
+      blurb: 'The brightest moon of Uranus, criss-crossed by branching canyons that look resurfaced by flows of icy slush.',
+      fun: [
+        'Its surface has far fewer craters than its siblings — a sign of recent activity.',
+        'Like all the major Uranian moons, it was only ever seen up close by Voyager 2.'
+      ]
+    },
+    {
+      id: 'umbriel', name: 'Umbriel', kind: 'moon', parent: 'uranus', color: 0x8f8b86,
+      radiusKm: 584.7, sync: true,
+      orbit: { periodD: 4.144, distF: 3.3, incl: 0.13 },
+      rows: [
+        ['Diameter', '1,169 km'],
+        ['Surface', 'the darkest of Uranus’s major moons'],
+        ['Orbital period', '4.14 days']
+      ],
+      blurb: 'The dark, heavily cratered twin of Ariel — its dull surface hides a mysterious bright ring nicknamed the "fluorescent Cheerio".',
+      fun: [
+        'It reflects only about half as much light as bright Ariel.',
+        'The bright ring "Wunda" sits on the floor of a large crater near its equator.'
+      ]
+    },
+    {
       id: 'titania', name: 'Titania', kind: 'moon', parent: 'uranus', color: 0xc2b0a0,
       radiusKm: 788.4, sync: true,
       orbit: { periodD: 8.7062, distF: 3.8, incl: 0.08 },
