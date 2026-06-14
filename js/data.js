@@ -584,6 +584,60 @@ const DATA = (function () {
       ]
     },
     {
+      id: 'quaoar', name: 'Quaoar', kind: 'dwarf', color: 0xc89a78,
+      radiusKm: 555, rotH: 17.68, tilt: 0,
+      elements: { a: 43.69, e: 0.039, i: 7.99, O: 188.8, wbar: 336.3, L: 268.2, P: 105495 },
+      rows: [
+        ['Diameter', '~1,110 km'],
+        ['Year', '289 Earth years'],
+        ['Distance from Sun', '~43 AU (nearly circular)'],
+        ['Moon', '1 (Weywot)'],
+        ['Discovered', '2002']
+      ],
+      blurb: 'A Kuiper Belt dwarf planet with a startling secret: a ring orbiting far beyond the distance where rings were thought to be possible, defying the textbooks.',
+      fun: [
+        'Its ring sits twice as far out as the limit where it "should" clump into a moon.',
+        'It is named after the creation god of the Tongva people of Southern California.',
+        'It may once have held a thin methane atmosphere, now frozen onto the surface.'
+      ]
+    },
+    {
+      id: 'orcus', name: 'Orcus', kind: 'dwarf', color: 0xc8d0dd,
+      radiusKm: 458, rotH: 13.19, tilt: 0,
+      elements: { a: 39.42, e: 0.227, i: 20.59, O: 268.5, wbar: 340.8, L: 162.5, P: 90396 },
+      rows: [
+        ['Diameter', '~910 km'],
+        ['Year', '247 Earth years'],
+        ['Distance from Sun', '~39 AU'],
+        ['Moon', '1 (Vanth)'],
+        ['Discovered', '2004']
+      ],
+      blurb: 'Nicknamed the "anti-Pluto": it shares Pluto’s orbital period but is always on the opposite side of its tilted, resonant path around the Sun.',
+      fun: [
+        'It and Pluto are locked in the same 3:2 resonance with Neptune, forever out of step.',
+        'Its large moon Vanth may be a captured dwarf planet in its own right.',
+        'Its surface shows water ice, hinting at past cryovolcanism.'
+      ]
+    },
+    {
+      id: 'gonggong', name: 'Gonggong', kind: 'dwarf', color: 0xb06a52,
+      radiusKm: 615, rotH: 22.4, tilt: 0,
+      elements: { a: 67.5, e: 0.503, i: 30.7, O: 336.8, wbar: 183.8, L: 284.4, P: 202300 },
+      rows: [
+        ['Diameter', '~1,230 km'],
+        ['Year', '554 Earth years'],
+        ['Distance from Sun', '34–101 AU'],
+        ['Moon', '1 (Xiangliu)'],
+        ['Discovered', '2007']
+      ],
+      blurb: 'One of the largest and reddest dwarf planets, on a wildly stretched, steeply tilted orbit that carries it far beyond the Kuiper Belt.',
+      fun: [
+        'It is named after a Chinese water god with a serpent’s body and red hair.',
+        'Its deep-red colour comes from irradiated organic frosts called tholins.',
+        'It is the largest Solar System body without an official close-up spacecraft visit.'
+      ]
+    },
+    {
       id: 'halley', name: "Halley's Comet", kind: 'comet', color: 0x9fd8ff,
       radiusKm: 5.5, lumpy: true,
       elements: { a: 17.834, e: 0.96714, i: 162.26, O: 58.42, w: 111.33, Tp: 2446470.95, P: 27510 },
