@@ -1182,18 +1182,22 @@ const SCENE = (function () {
     sunCorona.scale.set(coronaScale, coronaScale, 1);
     let occluded = false;
     if (sunDist > 12) {
-      raycaster.set(camPos, _v1.copy(byId.sun.wp).sub(camPos).normalize());
-      raycaster.far = sunDist - 4;
+      /* analytic ray-vs-sphere test toward the Sun — far cheaper than raycasting
+         the full-resolution planet meshes every frame, and visually identical */
+      const dir = _v1.copy(byId.sun.wp).sub(camPos);
+      const sunRay = dir.length();
+      dir.multiplyScalar(1 / sunRay);
+      const maxT = sunRay - 4;
       for (const b of bodies) {
-        if (b.def.kind === 'planet' && b.mesh) {
-          const hit = raycaster.intersectObject(b.mesh, false);
-          if (hit.length) { occluded = true; break; }
-        }
+        if (b.def.kind !== 'planet') continue;
+        const oc = _v2.copy(b.wp).sub(camPos);
+        const t = oc.dot(dir);
+        if (t <= 0 || t >= maxT) continue;
+        if (oc.lengthSq() - t * t < b.dispRad * b.dispRad) { occluded = true; break; }
       }
     }
     sunCorona.material.opacity = occluded ? 0 : 0.9;
     sunCore.material.opacity = occluded ? 0 : 0.95;
-    raycaster.far = Infinity;
 
     for (const b of bodies) {
       if (!b.marker && !b.labelEl) continue;
