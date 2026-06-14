@@ -292,7 +292,12 @@ const SCENE = (function () {
       marker: null, labelEl: null,
       sysR: 0,
       orbitLine: null, moonLine: null,
-      visible: true
+      visible: true,
+      /* deep-sky objects are pinned to the sky and never move — their world
+         position is cached once and skipped by the per-frame update */
+      fixed: def.kind === 'galaxy' || def.kind === 'nebula' ||
+        def.kind === 'blackhole' || def.kind === 'region' ||
+        (def.kind === 'star' && def.id !== 'sun')
     };
     bodies.push(b);
     byId[def.id] = b;
@@ -1044,6 +1049,11 @@ const SCENE = (function () {
       o.matrixAutoUpdate = false; /* keep matrixWorldAutoUpdate so children animate */
     }
 
+    /* cache the fixed (sky-pinned) bodies' world positions once; the per-frame
+       loop then only recomputes movers */
+    root.updateMatrixWorld();
+    for (const b of bodies) if (b.fixed) b.wp.setFromMatrixPosition(b.group.matrixWorld);
+
     progress('Ready');
   }
 
@@ -1101,6 +1111,11 @@ const SCENE = (function () {
 
     for (const b of bodies) {
       const def = b.def;
+      if (b.fixed) {
+        /* pinned to the sky: only a spinning galaxy disk still needs a nudge */
+        if (def.kind === 'galaxy' && b.galaxySpin) b.galaxyPlane.rotateZ(b.galaxySpin * dtReal);
+        continue;
+      }
       if (def.elements) ORB.helioPos(def.elements, simJD, b.group.position);
       if (def.rotH && b.spinMesh && !def.sync) {
         b.spinMesh.rotation.y = 2 * Math.PI * simDays * 24 / def.rotH;
@@ -1127,7 +1142,6 @@ const SCENE = (function () {
         b.group.position.copy(b.rayDir).multiplyScalar(r * DATA.AU);
         b.model.lookAt(0, 0, 0);
       }
-      if (def.kind === 'galaxy' && b.galaxySpin) b.galaxyPlane.rotateZ(b.galaxySpin * dtReal);
     }
 
     /* sun surface + glow flicker */
@@ -1195,7 +1209,7 @@ const SCENE = (function () {
        stars, nebulae, orbit lines, sky) are skipped; movers still propagate via
        their dirty flags */
     root.updateMatrixWorld();
-    for (const b of bodies) b.wp.setFromMatrixPosition(b.group.matrixWorld);
+    for (const b of bodies) if (!b.fixed) b.wp.setFromMatrixPosition(b.group.matrixWorld);
   }
 
   /* ---------- view-dependent: markers, labels, fades ---------- */
